@@ -31,6 +31,8 @@ spec:
             memory: 400Mi
         ports:
         - containerPort: 8080
+          name: metrics
+          protocol: TCP
         volumeMounts:
         - name: saml
           mountPath: /saml
