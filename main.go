@@ -114,6 +114,7 @@ func main() {
 			res, err := http.Get(url)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
+				continue
 			}
 			_, err = io.Copy(w, res.Body)
 			if err != nil {
