@@ -12,11 +12,7 @@ var collections = prometheus.NewSummary(prometheus.SummaryOpts{
 	Help: "A summary of the metadata aggregation performed by kube-saml-collector",
 })
 
-func registerAndServe() {
+func registerAndServeMetrics() {
 	prometheus.MustRegister(collections)
-	go http.ListenAndServe(":8080", promhttp.Handler())
-}
-
-func init() {
-	registerAndServe()
+	go http.ListenAndServe(*metricsAddr, promhttp.Handler())
 }

@@ -24,6 +24,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/rest"
@@ -43,6 +45,8 @@ var (
 	file      = flag.String("file", "", "Write all metadata out to the provided file name")
 	printOnly = flag.Bool("print-only", false, fmt.Sprintf("Set %s to only print out pod URLS that would have been collected", os.Args[0]))
 	interval  = flag.Duration("interval", 10*time.Second, "The polling interval for querying kubernetes pods")
+
+	metricsAddr = flag.String("metrics-listen", ":8080", "The $IP:$PORT address to listen on for metrics requests")
 )
 
 func init() {
@@ -50,6 +54,8 @@ func init() {
 }
 
 func main() {
+	registerAndServeMetrics()
+
 	var cfg *rest.Config
 
 	switch *host {
@@ -71,13 +77,15 @@ func main() {
 	}
 
 	for {
+		t := prometheus.NewTimer(collections)
+
 		pods, err := cli.Pods("").List(v1.ListOptions{})
 
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		var w io.Writer
+		var w *os.File
 		switch *file {
 		case "":
 			w = os.Stdout
@@ -89,6 +97,7 @@ func main() {
 		}
 
 		for i := range pods.Items {
+
 			if pods.Items[i].Annotations[annotSAMLMetadataEndpoint] == "" {
 				continue
 			}
@@ -112,12 +121,14 @@ func main() {
 			res.Body.Close()
 		}
 
-		if w, ok := w.(io.Closer); ok {
+		if *file != "" {
 			err = w.Close()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "Error closing file", err)
 			}
 		}
+
+		t.ObserveDuration()
 
 		time.Sleep(*interval)
 	}
