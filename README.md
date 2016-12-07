@@ -18,12 +18,30 @@ Usage:
 
 ```
 Usage of ./kube-saml-collector:
+  -alsologtostderr
+    	log to standard error as well as files
   -file string
     	Write all metadata out to the provided file name
   -host string
     	Set a custom kubernetes host. If unset, defaults to in-cluster config
   -interval duration
     	The polling interval for querying kubernetes pods (default 10s)
+  -log_backtrace_at value
+    	when logging hits line file:N, emit a stack trace
+  -log_dir string
+    	If non-empty, write log files in this directory
+  -logtostderr
+    	log to standard error instead of files
+  -metrics-listen string
+    	The $IP:$PORT address to listen on for metrics requests (default ":8080")
   -print-only
     	Set ./kube-saml-collector to only print out pod URLS that would have been collected
+  -serve-aggregate
+    	If true, the container will itself serve its aggregated metadata at /saml/metadata on the http listener addr/port
+  -stderrthreshold value
+    	logs at or above this threshold go to stderr
+  -v value
+    	log level for V logs
+  -vmodule value
+    	comma-separated list of pattern=N settings for file-filtered logging
 ```
