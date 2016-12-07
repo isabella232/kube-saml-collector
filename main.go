@@ -40,7 +40,8 @@ const (
 
 var (
 	host      = flag.String("host", "", "Set a custom kubernetes host. If unset, defaults to in-cluster config")
-	printOnly = flag.Bool("print-only", false, fmt.Sprintf("Set %s to only print out pod URLS that would have been collected."))
+	printOnly = flag.Bool("print-only", false, fmt.Sprintf("Set %s to only print out pod URLS that would have been collected", os.Args[0]))
+	interval  = flag.Duration("interval", 10*time.Second, "The polling interval for querying kubernetes pods")
 )
 
 func init() {
