@@ -42,11 +42,12 @@ const (
 
 var (
 	host      = flag.String("host", "", "Set a custom kubernetes host. If unset, defaults to in-cluster config")
-	file      = flag.String("file", "", "Write all metadata out to the provided file name")
 	printOnly = flag.Bool("print-only", false, fmt.Sprintf("Set %s to only print out pod URLS that would have been collected", os.Args[0]))
 	interval  = flag.Duration("interval", 10*time.Second, "The polling interval for querying kubernetes pods")
 
-	metricsAddr = flag.String("metrics-listen", ":8080", "The $IP:$PORT address to listen on for metrics requests")
+	file           = flag.String("file", "", "Write all metadata out to the provided file name")
+	serveAggregate = flag.Bool("serve-aggregate", false, "If true, the container will itself serve its aggregated metadata at /saml/metadata on the http listener addr/port")
+	metricsAddr    = flag.String("metrics-listen", ":8080", "The $IP:$PORT address to listen on for metrics requests")
 )
 
 func init() {
@@ -54,6 +55,7 @@ func init() {
 }
 
 func main() {
+	maybeServeMetadata()
 	registerAndServeMetrics()
 
 	var cfg *rest.Config

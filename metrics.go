@@ -14,5 +14,6 @@ var collections = prometheus.NewSummary(prometheus.SummaryOpts{
 
 func registerAndServeMetrics() {
 	prometheus.MustRegister(collections)
-	go http.ListenAndServe(*metricsAddr, promhttp.Handler())
+	http.Handle("/metrics", promhttp.Handler())
+	go http.ListenAndServe(*metricsAddr, nil)
 }
