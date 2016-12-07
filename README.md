@@ -3,7 +3,9 @@
 
 Usage:
 
-1. Run kube-saml-collector as a sidecar container to your IdP pod, and use
+1. Run kube-saml-collector as a [sidecar
+   container](http://blog.kubernetes.io/2015/06/the-distributed-system-toolkit-patterns.html)
+   to your IdP pod, and use
    `-file` to output metadata to a directory (probably `emptyDir`) mounted in
    both containers.
 2. Make sure your IdP is configured to read the metadata from the shared file.
