@@ -15,8 +15,10 @@ spec:
       - name: metadata-collector
         imagePullPolicy: Always
         image: andrewstuart/kube-saml-collector
-        args:
+        command:
+          - app # The generic golang:onbuild app name. This may change.
           - -file=/saml/test-metadata.xml
+          - -interval=30s #Customize this interval as needed
         resources:
           requests:
             cpu: 100m

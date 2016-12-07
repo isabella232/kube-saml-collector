@@ -18,7 +18,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -81,7 +80,7 @@ func main() {
 		var w io.Writer
 		switch *file {
 		case "":
-			w = ioutil.Discard
+			w = os.Stdout
 		default:
 			w, err = os.OpenFile(*file, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 			if err != nil {
@@ -105,7 +104,7 @@ func main() {
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 			}
-			_, err = io.Copy(io.MultiWriter(os.Stdout, w), res.Body)
+			_, err = io.Copy(w, res.Body)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				continue
