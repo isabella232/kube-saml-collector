@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: metadata-collector
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: metadata-collector
+        tier: IAM
+    spec:
+      containers:
+      - name: metadata-collector
+        imagePullPolicy: Always
+        image: andrewstuart/kube-saml-collector
+        args:
+          - -file=/saml/test-metadata.xml
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 200m
+            memory: 400Mi
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: saml
+          mountPath: /saml
+      volumes:
+      - name: saml
+        emptyDir: {}

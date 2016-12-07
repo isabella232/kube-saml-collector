@@ -18,6 +18,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -40,6 +41,7 @@ const (
 
 var (
 	host      = flag.String("host", "", "Set a custom kubernetes host. If unset, defaults to in-cluster config")
+	file      = flag.String("file", "", "Write all metadata out to the provided file name")
 	printOnly = flag.Bool("print-only", false, fmt.Sprintf("Set %s to only print out pod URLS that would have been collected", os.Args[0]))
 	interval  = flag.Duration("interval", 10*time.Second, "The polling interval for querying kubernetes pods")
 )
@@ -76,6 +78,17 @@ func main() {
 			log.Fatal(err)
 		}
 
+		var w io.Writer
+		switch *file {
+		case "":
+			w = ioutil.Discard
+		default:
+			w, err = os.OpenFile(*file, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+			if err != nil {
+				log.Fatalf("Error opening file %s for write:\n\t%s", *file, err)
+			}
+		}
+
 		for i := range pods.Items {
 			if pods.Items[i].Annotations[annotSAMLMetadataEndpoint] == "" {
 				continue
@@ -92,11 +105,22 @@ func main() {
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 			}
-			io.Copy(os.Stdout, res.Body)
+			_, err = io.Copy(io.MultiWriter(os.Stdout, w), res.Body)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				continue
+			}
 			res.Body.Close()
 		}
 
-		time.Sleep(10 * time.Second)
+		if w, ok := w.(io.Closer); ok {
+			err = w.Close()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Error closing file", err)
+			}
+		}
+
+		time.Sleep(*interval)
 	}
 }
 
