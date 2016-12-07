@@ -8,7 +8,7 @@ import (
 )
 
 var collections = prometheus.NewSummary(prometheus.SummaryOpts{
-	Name: "kube-saml-collector_collection_seconds",
+	Name: "kube_saml_collector_collection_seconds",
 	Help: "A summary of the metadata aggregation performed by kube-saml-collector",
 })
 
