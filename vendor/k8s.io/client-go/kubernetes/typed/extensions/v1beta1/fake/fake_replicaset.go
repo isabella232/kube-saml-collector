@@ -18,21 +18,21 @@ package fake
 
 import (
 	api "k8s.io/client-go/pkg/api"
-	unversioned "k8s.io/client-go/pkg/api/unversioned"
 	v1 "k8s.io/client-go/pkg/api/v1"
 	v1beta1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	labels "k8s.io/client-go/pkg/labels"
+	schema "k8s.io/client-go/pkg/runtime/schema"
 	watch "k8s.io/client-go/pkg/watch"
 	testing "k8s.io/client-go/testing"
 )
 
 // FakeReplicaSets implements ReplicaSetInterface
 type FakeReplicaSets struct {
-	Fake *FakeExtensions
+	Fake *FakeExtensionsV1beta1
 	ns   string
 }
 
-var replicasetsResource = unversioned.GroupVersionResource{Group: "extensions", Version: "v1beta1", Resource: "replicasets"}
+var replicasetsResource = schema.GroupVersionResource{Group: "extensions", Version: "v1beta1", Resource: "replicasets"}
 
 func (c *FakeReplicaSets) Create(replicaSet *v1beta1.ReplicaSet) (result *v1beta1.ReplicaSet, err error) {
 	obj, err := c.Fake.

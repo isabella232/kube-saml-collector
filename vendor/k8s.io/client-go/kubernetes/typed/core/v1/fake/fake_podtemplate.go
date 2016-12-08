@@ -18,20 +18,20 @@ package fake
 
 import (
 	api "k8s.io/client-go/pkg/api"
-	unversioned "k8s.io/client-go/pkg/api/unversioned"
 	v1 "k8s.io/client-go/pkg/api/v1"
 	labels "k8s.io/client-go/pkg/labels"
+	schema "k8s.io/client-go/pkg/runtime/schema"
 	watch "k8s.io/client-go/pkg/watch"
 	testing "k8s.io/client-go/testing"
 )
 
 // FakePodTemplates implements PodTemplateInterface
 type FakePodTemplates struct {
-	Fake *FakeCore
+	Fake *FakeCoreV1
 	ns   string
 }
 
-var podtemplatesResource = unversioned.GroupVersionResource{Group: "", Version: "v1", Resource: "podtemplates"}
+var podtemplatesResource = schema.GroupVersionResource{Group: "", Version: "v1", Resource: "podtemplates"}
 
 func (c *FakePodTemplates) Create(podTemplate *v1.PodTemplate) (result *v1.PodTemplate, err error) {
 	obj, err := c.Fake.

@@ -34,27 +34,18 @@ import (
 	"time"
 
 	"github.com/golang/glog"
-	"k8s.io/client-go/pkg/api"
 	apierrs "k8s.io/client-go/pkg/api/errors"
 	"k8s.io/client-go/pkg/api/meta"
+	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/runtime"
 	utilruntime "k8s.io/client-go/pkg/util/runtime"
 	"k8s.io/client-go/pkg/util/wait"
 	"k8s.io/client-go/pkg/watch"
 )
 
-// ListerWatcher is any object that knows how to perform an initial list and start a watch on a resource.
-type ListerWatcher interface {
-	// List should return a list type object; the Items field will be extracted, and the
-	// ResourceVersion field will be used to start the watch in the right place.
-	List(options api.ListOptions) (runtime.Object, error)
-	// Watch should begin a watch at the specified version.
-	Watch(options api.ListOptions) (watch.Interface, error)
-}
-
 // Reflector watches a specified resource and causes all changes to be reflected in the given store.
 type Reflector struct {
-	// name identifies this reflector.  By default it will be a file:line if possible.
+	// name identifies this reflector. By default it will be a file:line if possible.
 	name string
 
 	// The type of object we expect to place in the store.
@@ -83,12 +74,6 @@ var (
 	// However, it can be modified to avoid periodic resync to break the
 	// TCP connection.
 	minWatchTimeout = 5 * time.Minute
-	// If we are within 'forceResyncThreshold' from the next planned resync
-	// and are just before issuing Watch(), resync will be forced now.
-	forceResyncThreshold = 3 * time.Second
-	// We try to set timeouts for Watch() so that we will finish about
-	// than 'timeoutThreshold' from next planned periodic resync.
-	timeoutThreshold = 1 * time.Second
 )
 
 // NewNamespaceKeyedIndexerAndReflector creates an Indexer and a Reflector
@@ -123,7 +108,7 @@ func NewNamedReflector(name string, lw ListerWatcher, expectedType interface{}, 
 	return r
 }
 
-// internalPackages are packages that ignored when creating a default reflector name.  These packages are in the common
+// internalPackages are packages that ignored when creating a default reflector name. These packages are in the common
 // call chains to NewReflector, so they'd be low entropy names for reflectors
 var internalPackages = []string{"kubernetes/pkg/client/cache/", "/runtime/asm_"}
 
@@ -254,7 +239,7 @@ func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
 	// Explicitly set "0" as resource version - it's fine for the List()
 	// to be served from cache and potentially be delayed relative to
 	// etcd contents. Reflector framework will catch up via Watch() eventually.
-	options := api.ListOptions{ResourceVersion: "0"}
+	options := v1.ListOptions{ResourceVersion: "0"}
 	list, err := r.listerWatcher.List(options)
 	if err != nil {
 		return fmt.Errorf("%s: Failed to list %v: %v", r.name, r.expectedType, err)
@@ -293,7 +278,7 @@ func (r *Reflector) ListAndWatch(stopCh <-chan struct{}) error {
 
 	for {
 		timemoutseconds := int64(minWatchTimeout.Seconds() * (rand.Float64() + 1.0))
-		options = api.ListOptions{
+		options = v1.ListOptions{
 			ResourceVersion: resourceVersion,
 			// We want to avoid situations of hanging watchers. Stop any wachers that do not
 			// receive any events within the timeout window.

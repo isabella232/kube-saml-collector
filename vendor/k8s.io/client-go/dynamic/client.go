@@ -27,10 +27,11 @@ import (
 	"strings"
 
 	"k8s.io/client-go/pkg/api"
-	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/api/v1"
+	metav1 "k8s.io/client-go/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/conversion/queryparams"
 	"k8s.io/client-go/pkg/runtime"
+	"k8s.io/client-go/pkg/runtime/schema"
 	"k8s.io/client-go/pkg/runtime/serializer"
 	"k8s.io/client-go/pkg/util/flowcontrol"
 	"k8s.io/client-go/pkg/watch"
@@ -82,7 +83,7 @@ func (c *Client) GetRateLimiter() flowcontrol.RateLimiter {
 // Resource returns an API interface to the specified resource for this client's
 // group and version. If resource is not a namespaced resource, then namespace
 // is ignored. The ResourceClient inherits the parameter codec of c.
-func (c *Client) Resource(resource *unversioned.APIResource, namespace string) *ResourceClient {
+func (c *Client) Resource(resource *metav1.APIResource, namespace string) *ResourceClient {
 	return &ResourceClient{
 		cl:             c.cl,
 		resource:       resource,
@@ -103,7 +104,7 @@ func (c *Client) ParameterCodec(parameterCodec runtime.ParameterCodec) *Client {
 // dynamic client.
 type ResourceClient struct {
 	cl             *rest.RESTClient
-	resource       *unversioned.APIResource
+	resource       *metav1.APIResource
 	ns             string
 	parameterCodec runtime.ParameterCodec
 }
@@ -218,14 +219,14 @@ func (rc *ResourceClient) Patch(name string, pt api.PatchType, data []byte) (*ru
 // with special handling for Status objects.
 type dynamicCodec struct{}
 
-func (dynamicCodec) Decode(data []byte, gvk *unversioned.GroupVersionKind, obj runtime.Object) (runtime.Object, *unversioned.GroupVersionKind, error) {
+func (dynamicCodec) Decode(data []byte, gvk *schema.GroupVersionKind, obj runtime.Object) (runtime.Object, *schema.GroupVersionKind, error) {
 	obj, gvk, err := runtime.UnstructuredJSONScheme.Decode(data, gvk, obj)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	if _, ok := obj.(*unversioned.Status); !ok && strings.ToLower(gvk.Kind) == "status" {
-		obj = &unversioned.Status{}
+	if _, ok := obj.(*metav1.Status); !ok && strings.ToLower(gvk.Kind) == "status" {
+		obj = &metav1.Status{}
 		err := json.Unmarshal(data, obj)
 		if err != nil {
 			return nil, nil, err
@@ -264,11 +265,11 @@ func ContentConfig() rest.ContentConfig {
 // parameters without trying to convert to the target version.
 type parameterCodec struct{}
 
-func (parameterCodec) EncodeParameters(obj runtime.Object, to unversioned.GroupVersion) (url.Values, error) {
+func (parameterCodec) EncodeParameters(obj runtime.Object, to schema.GroupVersion) (url.Values, error) {
 	return queryparams.Convert(obj)
 }
 
-func (parameterCodec) DecodeParameters(parameters url.Values, from unversioned.GroupVersion, into runtime.Object) error {
+func (parameterCodec) DecodeParameters(parameters url.Values, from schema.GroupVersion, into runtime.Object) error {
 	return errors.New("DecodeParameters not implemented on dynamic parameterCodec")
 }
 
@@ -276,7 +277,7 @@ var defaultParameterEncoder runtime.ParameterCodec = parameterCodec{}
 
 type versionedParameterEncoderWithV1Fallback struct{}
 
-func (versionedParameterEncoderWithV1Fallback) EncodeParameters(obj runtime.Object, to unversioned.GroupVersion) (url.Values, error) {
+func (versionedParameterEncoderWithV1Fallback) EncodeParameters(obj runtime.Object, to schema.GroupVersion) (url.Values, error) {
 	ret, err := api.ParameterCodec.EncodeParameters(obj, to)
 	if err != nil && runtime.IsNotRegisteredError(err) {
 		// fallback to v1
@@ -285,7 +286,7 @@ func (versionedParameterEncoderWithV1Fallback) EncodeParameters(obj runtime.Obje
 	return ret, err
 }
 
-func (versionedParameterEncoderWithV1Fallback) DecodeParameters(parameters url.Values, from unversioned.GroupVersion, into runtime.Object) error {
+func (versionedParameterEncoderWithV1Fallback) DecodeParameters(parameters url.Values, from schema.GroupVersion, into runtime.Object) error {
 	return errors.New("DecodeParameters not implemented on versionedParameterEncoderWithV1Fallback")
 }
 

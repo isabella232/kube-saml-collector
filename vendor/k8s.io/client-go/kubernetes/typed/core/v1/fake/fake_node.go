@@ -18,19 +18,19 @@ package fake
 
 import (
 	api "k8s.io/client-go/pkg/api"
-	unversioned "k8s.io/client-go/pkg/api/unversioned"
 	v1 "k8s.io/client-go/pkg/api/v1"
 	labels "k8s.io/client-go/pkg/labels"
+	schema "k8s.io/client-go/pkg/runtime/schema"
 	watch "k8s.io/client-go/pkg/watch"
 	testing "k8s.io/client-go/testing"
 )
 
 // FakeNodes implements NodeInterface
 type FakeNodes struct {
-	Fake *FakeCore
+	Fake *FakeCoreV1
 }
 
-var nodesResource = unversioned.GroupVersionResource{Group: "", Version: "v1", Resource: "nodes"}
+var nodesResource = schema.GroupVersionResource{Group: "", Version: "v1", Resource: "nodes"}
 
 func (c *FakeNodes) Create(node *v1.Node) (result *v1.Node, err error) {
 	obj, err := c.Fake.
