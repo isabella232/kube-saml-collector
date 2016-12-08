@@ -46,7 +46,7 @@ var (
 
 	file           = flag.String("file", "", "Write all metadata out to the provided file name")
 	serveAggregate = flag.Bool("serve-aggregate", false, "If true, the container will itself serve its aggregated metadata at /saml/metadata on the http listener addr/port")
-	metricsAddr    = flag.String("metrics-listen", ":8080", "The $IP:$PORT address to listen on for metrics requests")
+	metricsAddr    = flag.String("metrics-listen", ":8000", "The $IP:$PORT address to listen on for metrics requests")
 )
 
 func init() {
