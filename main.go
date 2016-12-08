@@ -17,7 +17,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -87,16 +86,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		var w *os.File
-		switch *file {
-		case "":
-			w = os.Stdout
-		default:
-			w, err = os.OpenFile(*file, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
-			if err != nil {
-				log.Fatalf("Error opening file %s for write:\n\t%s", *file, err)
-			}
-		}
+		agg := aggregator{}
 
 		for i := range pods.Items {
 
@@ -116,15 +106,25 @@ func main() {
 				fmt.Fprintln(os.Stderr, err)
 				continue
 			}
-			_, err = io.Copy(w, res.Body)
+			err = agg.add(res.Body)
+			res.Body.Close()
+
 			if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 				continue
 			}
-			res.Body.Close()
 		}
 
 		if *file != "" {
+			w := os.Stdout
+			if *file != "" {
+				w, err = os.OpenFile(*file, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
+				if err != nil {
+					log.Fatalf("Error opening file %s for write:\n\t%s", *file, err)
+				}
+			}
+
+			agg.WriteTo(w)
 			err = w.Close()
 			if err != nil {
 				fmt.Fprintln(os.Stderr, "Error closing file", err)
