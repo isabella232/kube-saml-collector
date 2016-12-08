@@ -10,16 +10,16 @@ import (
 )
 
 type aggregator struct {
-	XMLName   xml.Name `xml:"EntitiesDescriptor"`
-	Entities  map[string]*etree.Element
-	rootAttrs map[string]etree.Attr
+	XMLName  xml.Name `xml:"EntitiesDescriptor"`
+	Entities map[string]*etree.Element
+	xmlns    map[string]etree.Attr
 }
 
 func (a *aggregator) add(r io.Reader) error {
 
 	if a.Entities == nil {
 		a.Entities = map[string]*etree.Element{}
-		a.rootAttrs = map[string]etree.Attr{}
+		a.xmlns = map[string]etree.Attr{}
 	}
 
 	d := etree.NewDocument()
@@ -34,7 +34,9 @@ func (a *aggregator) add(r io.Reader) error {
 	}
 
 	for _, attr := range root.Attr {
-		a.rootAttrs[strings.Join([]string{attr.Space, attr.Key}, ":")] = attr
+		if attr.Key == "xmlns" || attr.Space == "xmlns" {
+			a.xmlns[strings.Join([]string{attr.Space, attr.Key}, ":")] = attr
+		}
 	}
 
 	fmt.Printf("root = %+v\n", root)
@@ -62,8 +64,8 @@ func (a *aggregator) addElement(e *etree.Element) {
 func (a *aggregator) Doc() *etree.Document {
 	d := etree.NewDocument()
 	ele := etree.NewElement("EntitiesDescriptor")
-	ele.Attr = make([]etree.Attr, 0, len(a.rootAttrs))
-	for _, attr := range a.rootAttrs {
+	ele.Attr = make([]etree.Attr, 0, len(a.xmlns))
+	for _, attr := range a.xmlns {
 		ele.Attr = append(ele.Attr, attr)
 	}
 
