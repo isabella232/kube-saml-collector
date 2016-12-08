@@ -14,6 +14,17 @@ func TestAggregator(t *testing.T) {
 	asrt.NoError(a.add(strings.NewReader(testMD)))
 	asrt.Len(a.Entities, 3)
 	asrt.Equal("EntityDescriptor", a.Entities["https://portal.astuart.co/uPortal"].Tag)
+
+	asrt.Len(a.xmlns, 4)
+
+	d := a.Doc()
+
+	ct := 0
+	for _, at := range d.Root().Attr {
+		asrt.True(at.Key == "xmlns" || at.Space == "xmlns")
+		ct++
+	}
+	asrt.Equal(4, ct)
 }
 
 const testMD = `

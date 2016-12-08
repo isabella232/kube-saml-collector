@@ -16,6 +16,12 @@ type aggregator struct {
 	xmlns    map[string]etree.Attr
 }
 
+const (
+	metadataNamespaceURN = "urn:oasis:names:tc:SAML:2.0:metadata"
+
+	xmlns = "xmlns"
+)
+
 func (a *aggregator) add(r io.Reader) error {
 
 	if a.Entities == nil {
@@ -35,7 +41,7 @@ func (a *aggregator) add(r io.Reader) error {
 	}
 
 	for _, attr := range root.Attr {
-		if attr.Key == "xmlns" || attr.Space == "xmlns" {
+		if attr.Key == xmlns || attr.Space == xmlns {
 			a.xmlns[strings.Join([]string{attr.Space, attr.Key}, ":")] = attr
 		}
 	}
@@ -62,9 +68,12 @@ func (a *aggregator) addElement(e *etree.Element) {
 }
 
 func (a *aggregator) Doc() *etree.Document {
+	a.xmlns[":xmlns"] = etree.Attr{Key: xmlns, Value: metadataNamespaceURN}
+
 	d := etree.NewDocument()
 	ele := etree.NewElement("EntitiesDescriptor")
 	ele.Attr = make([]etree.Attr, 0, len(a.xmlns))
+
 	for _, attr := range a.xmlns {
 		ele.Attr = append(ele.Attr, attr)
 	}
