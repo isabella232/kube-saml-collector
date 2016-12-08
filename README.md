@@ -11,9 +11,9 @@ Usage:
 2. Make sure your IdP is configured to read the metadata from the shared file.
 3. For all SP pods that have valid saml metadata endpoints (usually
    `$APP/saml/metadata`), annotate them with the following options:
-   - `k8s.unicon.net/saml-metadata-endpoint: /your/endpoint/here` *Required
-	 - `k8s.unicon.net/saml-metadata-port: "8080"` *Optional
-	 - `k8s.unicon.net/saml-metadata-protocol: "http"` *Optional; http by default
+ - `k8s.unicon.net/saml-metadata-endpoint: /your/endpoint/here` *Required
+ - `k8s.unicon.net/saml-metadata-port: "8080"` *Optional
+ - `k8s.unicon.net/saml-metadata-protocol: "http"` *Optional; http by default
        for inside the k8s network
 
 ```
