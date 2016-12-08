@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/beevik/etree"
+	"github.com/golang/glog"
 )
 
 type aggregator struct {
@@ -39,8 +40,6 @@ func (a *aggregator) add(r io.Reader) error {
 		}
 	}
 
-	fmt.Printf("root = %+v\n", root)
-
 	switch root.Tag {
 	case "EntitiesDescriptor":
 		for _, child := range root.ChildElements() {
@@ -56,6 +55,7 @@ func (a *aggregator) add(r io.Reader) error {
 
 func (a *aggregator) addElement(e *etree.Element) {
 	k := e.SelectAttrValue("entityID", "")
+	glog.Infof("Adding entity id \"%s\".\n", k)
 	if k != "" {
 		a.Entities[k] = e
 	}

@@ -17,12 +17,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"k8s.io/client-go/kubernetes"
@@ -64,7 +64,7 @@ func main() {
 		var err error
 		cfg, err = rest.InClusterConfig()
 		if err != nil {
-			log.Fatal(err)
+			glog.Fatal(err)
 		}
 	default:
 		cfg = &rest.Config{
@@ -74,7 +74,7 @@ func main() {
 
 	cli, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
-		log.Fatal(err)
+		glog.Fatal(err)
 	}
 
 	for {
@@ -83,7 +83,7 @@ func main() {
 		pods, err := cli.Pods("").List(v1.ListOptions{})
 
 		if err != nil {
-			log.Fatal(err)
+			glog.Fatal(err)
 		}
 
 		agg := aggregator{}
@@ -120,14 +120,14 @@ func main() {
 			if *file != "" {
 				w, err = os.OpenFile(*file, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644)
 				if err != nil {
-					log.Fatalf("Error opening file %s for write:\n\t%s", *file, err)
+					glog.Fatalf("Error opening file %s for write:\n\t%s", *file, err)
 				}
 			}
 
 			agg.WriteTo(w)
 			err = w.Close()
 			if err != nil {
-				fmt.Fprintln(os.Stderr, "Error closing file", err)
+				glog.Error("Error closing file", err)
 			}
 		}
 
