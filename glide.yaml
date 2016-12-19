@@ -7,4 +7,4 @@ import:
   - pkg/api/v1
   - rest
 - package: github.com/prometheus/client_golang
-  version: ^0.8.0
+  version: 575f371f7862609249a1be4c9145f429fe065e32
