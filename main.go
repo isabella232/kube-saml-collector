@@ -15,8 +15,6 @@
 package main
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"flag"
 	"fmt"
 	"net/http"
@@ -76,13 +74,10 @@ func main() {
 		}
 	}
 
-	if os.Getenv(envRootCA) != "" {
-		glog.Info("Root CA pulled from environment: " + os.Getenv(envRootCA))
-		cp := x509.NewCertPool()
-		cp.AppendCertsFromPEM([]byte(os.Getenv(envRootCA)))
-		cfg.Transport = &http.Transport{
-			TLSClientConfig: &tls.Config{RootCAs: cp},
-		}
+	ca := os.Getenv(envRootCA)
+	if ca != "" {
+		glog.Info("Root CA pulled from environment: " + ca)
+		cfg.CAData = []byte(ca)
 	}
 
 	cli, err := kubernetes.NewForConfig(cfg)
