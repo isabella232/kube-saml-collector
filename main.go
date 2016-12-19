@@ -39,6 +39,8 @@ const (
 
 	defaultPort  = "8080"
 	defaultProto = "http"
+
+	envRootCA = "ROOT_CA"
 )
 
 var (
@@ -74,9 +76,10 @@ func main() {
 		}
 	}
 
-	if os.Getenv("ROOT_CA") != "" {
+	if os.Getenv(envRootCA) != "" {
+		glog.Info("Root CA pulled from environment: " + os.Getenv(envRootCA))
 		cp := x509.NewCertPool()
-		cp.AppendCertsFromPEM([]byte(os.Getenv("ROOT_CA")))
+		cp.AppendCertsFromPEM([]byte(os.Getenv(envRootCA)))
 		cfg.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{RootCAs: cp},
 		}
