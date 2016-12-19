@@ -18,6 +18,6 @@ package fake
 
 // FakeLocalSubjectAccessReviews implements LocalSubjectAccessReviewInterface
 type FakeLocalSubjectAccessReviews struct {
-	Fake *FakeAuthorizationV1beta1
+	Fake *FakeAuthorization
 	ns   string
 }

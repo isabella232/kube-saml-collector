@@ -18,20 +18,20 @@ package fake
 
 import (
 	api "k8s.io/client-go/pkg/api"
+	unversioned "k8s.io/client-go/pkg/api/unversioned"
 	v1 "k8s.io/client-go/pkg/api/v1"
 	v1alpha1 "k8s.io/client-go/pkg/apis/certificates/v1alpha1"
 	labels "k8s.io/client-go/pkg/labels"
-	schema "k8s.io/client-go/pkg/runtime/schema"
 	watch "k8s.io/client-go/pkg/watch"
 	testing "k8s.io/client-go/testing"
 )
 
 // FakeCertificateSigningRequests implements CertificateSigningRequestInterface
 type FakeCertificateSigningRequests struct {
-	Fake *FakeCertificatesV1alpha1
+	Fake *FakeCertificates
 }
 
-var certificatesigningrequestsResource = schema.GroupVersionResource{Group: "certificates.k8s.io", Version: "v1alpha1", Resource: "certificatesigningrequests"}
+var certificatesigningrequestsResource = unversioned.GroupVersionResource{Group: "certificates.k8s.io", Version: "v1alpha1", Resource: "certificatesigningrequests"}
 
 func (c *FakeCertificateSigningRequests) Create(certificateSigningRequest *v1alpha1.CertificateSigningRequest) (result *v1alpha1.CertificateSigningRequest, err error) {
 	obj, err := c.Fake.

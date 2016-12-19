@@ -50,7 +50,7 @@ type certificateSigningRequests struct {
 }
 
 // newCertificateSigningRequests returns a CertificateSigningRequests
-func newCertificateSigningRequests(c *CertificatesV1alpha1Client) *certificateSigningRequests {
+func newCertificateSigningRequests(c *CertificatesClient) *certificateSigningRequests {
 	return &certificateSigningRequests{
 		client: c.RESTClient(),
 	}

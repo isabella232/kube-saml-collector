@@ -17,31 +17,28 @@ limitations under the License.
 package v1alpha1
 
 import (
-	fmt "fmt"
-
 	api "k8s.io/client-go/pkg/api"
 	registered "k8s.io/client-go/pkg/apimachinery/registered"
-	"k8s.io/client-go/pkg/runtime/schema"
 	serializer "k8s.io/client-go/pkg/runtime/serializer"
 	rest "k8s.io/client-go/rest"
 )
 
-type PolicyV1alpha1Interface interface {
+type PolicyInterface interface {
 	RESTClient() rest.Interface
 	PodDisruptionBudgetsGetter
 }
 
-// PolicyV1alpha1Client is used to interact with features provided by the k8s.io/kubernetes/pkg/apimachinery/registered.Group group.
-type PolicyV1alpha1Client struct {
+// PolicyClient is used to interact with features provided by the Policy group.
+type PolicyClient struct {
 	restClient rest.Interface
 }
 
-func (c *PolicyV1alpha1Client) PodDisruptionBudgets(namespace string) PodDisruptionBudgetInterface {
+func (c *PolicyClient) PodDisruptionBudgets(namespace string) PodDisruptionBudgetInterface {
 	return newPodDisruptionBudgets(c, namespace)
 }
 
-// NewForConfig creates a new PolicyV1alpha1Client for the given config.
-func NewForConfig(c *rest.Config) (*PolicyV1alpha1Client, error) {
+// NewForConfig creates a new PolicyClient for the given config.
+func NewForConfig(c *rest.Config) (*PolicyClient, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -50,12 +47,12 @@ func NewForConfig(c *rest.Config) (*PolicyV1alpha1Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &PolicyV1alpha1Client{client}, nil
+	return &PolicyClient{client}, nil
 }
 
-// NewForConfigOrDie creates a new PolicyV1alpha1Client for the given config and
+// NewForConfigOrDie creates a new PolicyClient for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *PolicyV1alpha1Client {
+func NewForConfigOrDie(c *rest.Config) *PolicyClient {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -63,26 +60,26 @@ func NewForConfigOrDie(c *rest.Config) *PolicyV1alpha1Client {
 	return client
 }
 
-// New creates a new PolicyV1alpha1Client for the given RESTClient.
-func New(c rest.Interface) *PolicyV1alpha1Client {
-	return &PolicyV1alpha1Client{c}
+// New creates a new PolicyClient for the given RESTClient.
+func New(c rest.Interface) *PolicyClient {
+	return &PolicyClient{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
-	gv, err := schema.ParseGroupVersion("policy/v1alpha1")
+	// if policy group is not registered, return an error
+	g, err := registered.Group("policy")
 	if err != nil {
 		return err
-	}
-	// if policy/v1alpha1 is not enabled, return an error
-	if !registered.IsEnabledVersion(gv) {
-		return fmt.Errorf("policy/v1alpha1 is not enabled")
 	}
 	config.APIPath = "/apis"
 	if config.UserAgent == "" {
 		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}
-	copyGroupVersion := gv
+	// TODO: Unconditionally set the config.Version, until we fix the config.
+	//if config.Version == "" {
+	copyGroupVersion := g.GroupVersion
 	config.GroupVersion = &copyGroupVersion
+	//}
 
 	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: api.Codecs}
 
@@ -91,7 +88,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *PolicyV1alpha1Client) RESTClient() rest.Interface {
+func (c *PolicyClient) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

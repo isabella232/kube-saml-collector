@@ -26,7 +26,6 @@ import (
 	conversion "k8s.io/client-go/pkg/conversion"
 	runtime "k8s.io/client-go/pkg/runtime"
 	config "k8s.io/client-go/pkg/util/config"
-	unsafe "unsafe"
 )
 
 func init() {
@@ -66,13 +65,12 @@ func autoConvert_v1alpha1_KubeProxyConfiguration_To_componentconfig_KubeProxyCon
 	out.HealthzBindAddress = in.HealthzBindAddress
 	out.HealthzPort = in.HealthzPort
 	out.HostnameOverride = in.HostnameOverride
-	out.IPTablesMasqueradeBit = (*int32)(unsafe.Pointer(in.IPTablesMasqueradeBit))
+	out.IPTablesMasqueradeBit = in.IPTablesMasqueradeBit
 	out.IPTablesSyncPeriod = in.IPTablesSyncPeriod
-	out.IPTablesMinSyncPeriod = in.IPTablesMinSyncPeriod
 	out.KubeconfigPath = in.KubeconfigPath
 	out.MasqueradeAll = in.MasqueradeAll
 	out.Master = in.Master
-	out.OOMScoreAdj = (*int32)(unsafe.Pointer(in.OOMScoreAdj))
+	out.OOMScoreAdj = in.OOMScoreAdj
 	out.Mode = componentconfig.ProxyMode(in.Mode)
 	out.PortRange = in.PortRange
 	out.ResourceContainer = in.ResourceContainer
@@ -81,7 +79,6 @@ func autoConvert_v1alpha1_KubeProxyConfiguration_To_componentconfig_KubeProxyCon
 	out.ConntrackMaxPerCore = in.ConntrackMaxPerCore
 	out.ConntrackMin = in.ConntrackMin
 	out.ConntrackTCPEstablishedTimeout = in.ConntrackTCPEstablishedTimeout
-	out.ConntrackTCPCloseWaitTimeout = in.ConntrackTCPCloseWaitTimeout
 	return nil
 }
 
@@ -95,13 +92,12 @@ func autoConvert_componentconfig_KubeProxyConfiguration_To_v1alpha1_KubeProxyCon
 	out.HealthzBindAddress = in.HealthzBindAddress
 	out.HealthzPort = in.HealthzPort
 	out.HostnameOverride = in.HostnameOverride
-	out.IPTablesMasqueradeBit = (*int32)(unsafe.Pointer(in.IPTablesMasqueradeBit))
+	out.IPTablesMasqueradeBit = in.IPTablesMasqueradeBit
 	out.IPTablesSyncPeriod = in.IPTablesSyncPeriod
-	out.IPTablesMinSyncPeriod = in.IPTablesMinSyncPeriod
 	out.KubeconfigPath = in.KubeconfigPath
 	out.MasqueradeAll = in.MasqueradeAll
 	out.Master = in.Master
-	out.OOMScoreAdj = (*int32)(unsafe.Pointer(in.OOMScoreAdj))
+	out.OOMScoreAdj = in.OOMScoreAdj
 	out.Mode = ProxyMode(in.Mode)
 	out.PortRange = in.PortRange
 	out.ResourceContainer = in.ResourceContainer
@@ -110,7 +106,6 @@ func autoConvert_componentconfig_KubeProxyConfiguration_To_v1alpha1_KubeProxyCon
 	out.ConntrackMaxPerCore = in.ConntrackMaxPerCore
 	out.ConntrackMin = in.ConntrackMin
 	out.ConntrackTCPEstablishedTimeout = in.ConntrackTCPEstablishedTimeout
-	out.ConntrackTCPCloseWaitTimeout = in.ConntrackTCPCloseWaitTimeout
 	return nil
 }
 
@@ -126,7 +121,6 @@ func autoConvert_v1alpha1_KubeSchedulerConfiguration_To_componentconfig_KubeSche
 	if err := api.Convert_Pointer_bool_To_bool(&in.EnableProfiling, &out.EnableProfiling, s); err != nil {
 		return err
 	}
-	out.EnableContentionProfiling = in.EnableContentionProfiling
 	out.ContentType = in.ContentType
 	out.KubeAPIQPS = in.KubeAPIQPS
 	out.KubeAPIBurst = int32(in.KubeAPIBurst)
@@ -151,7 +145,6 @@ func autoConvert_componentconfig_KubeSchedulerConfiguration_To_v1alpha1_KubeSche
 	if err := api.Convert_bool_To_Pointer_bool(&in.EnableProfiling, &out.EnableProfiling, s); err != nil {
 		return err
 	}
-	out.EnableContentionProfiling = in.EnableContentionProfiling
 	out.ContentType = in.ContentType
 	out.KubeAPIQPS = in.KubeAPIQPS
 	out.KubeAPIBurst = int(in.KubeAPIBurst)
@@ -278,9 +271,9 @@ func autoConvert_v1alpha1_KubeletConfiguration_To_componentconfig_KubeletConfigu
 	if err := api.Convert_Pointer_bool_To_bool(&in.AllowPrivileged, &out.AllowPrivileged, s); err != nil {
 		return err
 	}
-	out.HostNetworkSources = *(*[]string)(unsafe.Pointer(&in.HostNetworkSources))
-	out.HostPIDSources = *(*[]string)(unsafe.Pointer(&in.HostPIDSources))
-	out.HostIPCSources = *(*[]string)(unsafe.Pointer(&in.HostIPCSources))
+	out.HostNetworkSources = in.HostNetworkSources
+	out.HostPIDSources = in.HostPIDSources
+	out.HostIPCSources = in.HostIPCSources
 	if err := api.Convert_Pointer_int32_To_int32(&in.RegistryPullQPS, &out.RegistryPullQPS, s); err != nil {
 		return err
 	}
@@ -332,7 +325,7 @@ func autoConvert_v1alpha1_KubeletConfiguration_To_componentconfig_KubeletConfigu
 	out.RuntimeCgroups = in.RuntimeCgroups
 	out.SystemCgroups = in.SystemCgroups
 	out.CgroupRoot = in.CgroupRoot
-	if err := api.Convert_Pointer_bool_To_bool(&in.ExperimentalCgroupsPerQOS, &out.ExperimentalCgroupsPerQOS, s); err != nil {
+	if err := api.Convert_Pointer_bool_To_bool(&in.CgroupsPerQOS, &out.CgroupsPerQOS, s); err != nil {
 		return err
 	}
 	out.CgroupDriver = in.CgroupDriver
@@ -342,6 +335,7 @@ func autoConvert_v1alpha1_KubeletConfiguration_To_componentconfig_KubeletConfigu
 	out.RuntimeRequestTimeout = in.RuntimeRequestTimeout
 	out.RktPath = in.RktPath
 	out.ExperimentalMounterPath = in.ExperimentalMounterPath
+	out.ExperimentalMounterRootfsPath = in.ExperimentalMounterRootfsPath
 	out.RktAPIEndpoint = in.RktAPIEndpoint
 	out.RktStage1Image = in.RktStage1Image
 	if err := api.Convert_Pointer_string_To_string(&in.LockFilePath, &out.LockFilePath, s); err != nil {
@@ -378,7 +372,7 @@ func autoConvert_v1alpha1_KubeletConfiguration_To_componentconfig_KubeletConfigu
 	}
 	out.OutOfDiskTransitionFrequency = in.OutOfDiskTransitionFrequency
 	out.NodeIP = in.NodeIP
-	out.NodeLabels = *(*map[string]string)(unsafe.Pointer(&in.NodeLabels))
+	out.NodeLabels = in.NodeLabels
 	out.NonMasqueradeCIDR = in.NonMasqueradeCIDR
 	out.EnableCustomMetrics = in.EnableCustomMetrics
 	if err := api.Convert_Pointer_string_To_string(&in.EvictionHard, &out.EvictionHard, s); err != nil {
@@ -393,8 +387,24 @@ func autoConvert_v1alpha1_KubeletConfiguration_To_componentconfig_KubeletConfigu
 	if err := api.Convert_Pointer_bool_To_bool(&in.EnableControllerAttachDetach, &out.EnableControllerAttachDetach, s); err != nil {
 		return err
 	}
-	out.SystemReserved = *(*config.ConfigurationMap)(unsafe.Pointer(&in.SystemReserved))
-	out.KubeReserved = *(*config.ConfigurationMap)(unsafe.Pointer(&in.KubeReserved))
+	if in.SystemReserved != nil {
+		in, out := &in.SystemReserved, &out.SystemReserved
+		*out = make(config.ConfigurationMap, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	} else {
+		out.SystemReserved = nil
+	}
+	if in.KubeReserved != nil {
+		in, out := &in.KubeReserved, &out.KubeReserved
+		*out = make(config.ConfigurationMap, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	} else {
+		out.KubeReserved = nil
+	}
 	out.ProtectKernelDefaults = in.ProtectKernelDefaults
 	if err := api.Convert_Pointer_bool_To_bool(&in.MakeIPTablesUtilChains, &out.MakeIPTablesUtilChains, s); err != nil {
 		return err
@@ -405,11 +415,8 @@ func autoConvert_v1alpha1_KubeletConfiguration_To_componentconfig_KubeletConfigu
 	if err := api.Convert_Pointer_int32_To_int32(&in.IPTablesDropBit, &out.IPTablesDropBit, s); err != nil {
 		return err
 	}
-	out.AllowedUnsafeSysctls = *(*[]string)(unsafe.Pointer(&in.AllowedUnsafeSysctls))
-	out.FeatureGates = in.FeatureGates
-	out.EnableCRI = in.EnableCRI
-	out.ExperimentalFailSwapOn = in.ExperimentalFailSwapOn
-	out.ExperimentalCheckNodeCapabilitiesBeforeMount = in.ExperimentalCheckNodeCapabilitiesBeforeMount
+	out.AllowedUnsafeSysctls = in.AllowedUnsafeSysctls
+	out.ExperimentalRuntimeIntegrationType = in.ExperimentalRuntimeIntegrationType
 	return nil
 }
 
@@ -447,9 +454,9 @@ func autoConvert_componentconfig_KubeletConfiguration_To_v1alpha1_KubeletConfigu
 	if err := api.Convert_bool_To_Pointer_bool(&in.AllowPrivileged, &out.AllowPrivileged, s); err != nil {
 		return err
 	}
-	out.HostNetworkSources = *(*[]string)(unsafe.Pointer(&in.HostNetworkSources))
-	out.HostPIDSources = *(*[]string)(unsafe.Pointer(&in.HostPIDSources))
-	out.HostIPCSources = *(*[]string)(unsafe.Pointer(&in.HostIPCSources))
+	out.HostNetworkSources = in.HostNetworkSources
+	out.HostPIDSources = in.HostPIDSources
+	out.HostIPCSources = in.HostIPCSources
 	if err := api.Convert_int32_To_Pointer_int32(&in.RegistryPullQPS, &out.RegistryPullQPS, s); err != nil {
 		return err
 	}
@@ -498,7 +505,7 @@ func autoConvert_componentconfig_KubeletConfiguration_To_v1alpha1_KubeletConfigu
 	out.CloudProvider = in.CloudProvider
 	out.CloudConfigFile = in.CloudConfigFile
 	out.KubeletCgroups = in.KubeletCgroups
-	if err := api.Convert_bool_To_Pointer_bool(&in.ExperimentalCgroupsPerQOS, &out.ExperimentalCgroupsPerQOS, s); err != nil {
+	if err := api.Convert_bool_To_Pointer_bool(&in.CgroupsPerQOS, &out.CgroupsPerQOS, s); err != nil {
 		return err
 	}
 	out.CgroupDriver = in.CgroupDriver
@@ -511,6 +518,7 @@ func autoConvert_componentconfig_KubeletConfiguration_To_v1alpha1_KubeletConfigu
 	out.RuntimeRequestTimeout = in.RuntimeRequestTimeout
 	out.RktPath = in.RktPath
 	out.ExperimentalMounterPath = in.ExperimentalMounterPath
+	out.ExperimentalMounterRootfsPath = in.ExperimentalMounterRootfsPath
 	out.RktAPIEndpoint = in.RktAPIEndpoint
 	out.RktStage1Image = in.RktStage1Image
 	if err := api.Convert_string_To_Pointer_string(&in.LockFilePath, &out.LockFilePath, s); err != nil {
@@ -547,7 +555,7 @@ func autoConvert_componentconfig_KubeletConfiguration_To_v1alpha1_KubeletConfigu
 	}
 	out.OutOfDiskTransitionFrequency = in.OutOfDiskTransitionFrequency
 	out.NodeIP = in.NodeIP
-	out.NodeLabels = *(*map[string]string)(unsafe.Pointer(&in.NodeLabels))
+	out.NodeLabels = in.NodeLabels
 	out.NonMasqueradeCIDR = in.NonMasqueradeCIDR
 	out.EnableCustomMetrics = in.EnableCustomMetrics
 	if err := api.Convert_string_To_Pointer_string(&in.EvictionHard, &out.EvictionHard, s); err != nil {
@@ -562,8 +570,24 @@ func autoConvert_componentconfig_KubeletConfiguration_To_v1alpha1_KubeletConfigu
 	if err := api.Convert_bool_To_Pointer_bool(&in.EnableControllerAttachDetach, &out.EnableControllerAttachDetach, s); err != nil {
 		return err
 	}
-	out.SystemReserved = *(*map[string]string)(unsafe.Pointer(&in.SystemReserved))
-	out.KubeReserved = *(*map[string]string)(unsafe.Pointer(&in.KubeReserved))
+	if in.SystemReserved != nil {
+		in, out := &in.SystemReserved, &out.SystemReserved
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	} else {
+		out.SystemReserved = nil
+	}
+	if in.KubeReserved != nil {
+		in, out := &in.KubeReserved, &out.KubeReserved
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	} else {
+		out.KubeReserved = nil
+	}
 	out.ProtectKernelDefaults = in.ProtectKernelDefaults
 	if err := api.Convert_bool_To_Pointer_bool(&in.MakeIPTablesUtilChains, &out.MakeIPTablesUtilChains, s); err != nil {
 		return err
@@ -574,11 +598,8 @@ func autoConvert_componentconfig_KubeletConfiguration_To_v1alpha1_KubeletConfigu
 	if err := api.Convert_int32_To_Pointer_int32(&in.IPTablesDropBit, &out.IPTablesDropBit, s); err != nil {
 		return err
 	}
-	out.AllowedUnsafeSysctls = *(*[]string)(unsafe.Pointer(&in.AllowedUnsafeSysctls))
-	out.FeatureGates = in.FeatureGates
-	out.EnableCRI = in.EnableCRI
-	out.ExperimentalFailSwapOn = in.ExperimentalFailSwapOn
-	out.ExperimentalCheckNodeCapabilitiesBeforeMount = in.ExperimentalCheckNodeCapabilitiesBeforeMount
+	out.AllowedUnsafeSysctls = in.AllowedUnsafeSysctls
+	out.ExperimentalRuntimeIntegrationType = in.ExperimentalRuntimeIntegrationType
 	return nil
 }
 

@@ -49,7 +49,7 @@ type persistentVolumes struct {
 }
 
 // newPersistentVolumes returns a PersistentVolumes
-func newPersistentVolumes(c *CoreV1Client) *persistentVolumes {
+func newPersistentVolumes(c *CoreClient) *persistentVolumes {
 	return &persistentVolumes{
 		client: c.RESTClient(),
 	}

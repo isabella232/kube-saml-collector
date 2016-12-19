@@ -15,3 +15,7 @@ limitations under the License.
 */
 
 package v1beta1
+
+type LocalSubjectAccessReviewExpansion interface{}
+
+type SelfSubjectAccessReviewExpansion interface{}

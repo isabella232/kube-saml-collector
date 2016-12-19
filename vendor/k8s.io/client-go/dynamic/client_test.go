@@ -26,10 +26,9 @@ import (
 	"testing"
 
 	"k8s.io/client-go/pkg/api"
+	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/api/v1"
-	metav1 "k8s.io/client-go/pkg/apis/meta/v1"
 	"k8s.io/client-go/pkg/runtime"
-	"k8s.io/client-go/pkg/runtime/schema"
 	"k8s.io/client-go/pkg/runtime/serializer/streaming"
 	"k8s.io/client-go/pkg/watch"
 	"k8s.io/client-go/pkg/watch/versioned"
@@ -58,7 +57,7 @@ func getObject(version, kind, name string) *runtime.Unstructured {
 	}
 }
 
-func getClientServer(gv *schema.GroupVersion, h func(http.ResponseWriter, *http.Request)) (*Client, *httptest.Server, error) {
+func getClientServer(gv *unversioned.GroupVersion, h func(http.ResponseWriter, *http.Request)) (*Client, *httptest.Server, error) {
 	srv := httptest.NewServer(http.HandlerFunc(h))
 	cl, err := NewClient(&rest.Config{
 		Host:          srv.URL,
@@ -116,8 +115,8 @@ func TestList(t *testing.T) {
 		},
 	}
 	for _, tc := range tcs {
-		gv := &schema.GroupVersion{Group: "gtest", Version: "vtest"}
-		resource := &metav1.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
+		gv := &unversioned.GroupVersion{Group: "gtest", Version: "vtest"}
+		resource := &unversioned.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
 		cl, srv, err := getClientServer(gv, func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != "GET" {
 				t.Errorf("List(%q) got HTTP method %s. wanted GET", tc.name, r.Method)
@@ -171,8 +170,8 @@ func TestGet(t *testing.T) {
 		},
 	}
 	for _, tc := range tcs {
-		gv := &schema.GroupVersion{Group: "gtest", Version: "vtest"}
-		resource := &metav1.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
+		gv := &unversioned.GroupVersion{Group: "gtest", Version: "vtest"}
+		resource := &unversioned.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
 		cl, srv, err := getClientServer(gv, func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != "GET" {
 				t.Errorf("Get(%q) got HTTP method %s. wanted GET", tc.name, r.Method)
@@ -204,9 +203,9 @@ func TestGet(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	statusOK := &metav1.Status{
-		TypeMeta: metav1.TypeMeta{Kind: "Status"},
-		Status:   metav1.StatusSuccess,
+	statusOK := &unversioned.Status{
+		TypeMeta: unversioned.TypeMeta{Kind: "Status"},
+		Status:   unversioned.StatusSuccess,
 	}
 	tcs := []struct {
 		namespace string
@@ -224,8 +223,8 @@ func TestDelete(t *testing.T) {
 		},
 	}
 	for _, tc := range tcs {
-		gv := &schema.GroupVersion{Group: "gtest", Version: "vtest"}
-		resource := &metav1.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
+		gv := &unversioned.GroupVersion{Group: "gtest", Version: "vtest"}
+		resource := &unversioned.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
 		cl, srv, err := getClientServer(gv, func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != "DELETE" {
 				t.Errorf("Delete(%q) got HTTP method %s. wanted DELETE", tc.name, r.Method)
@@ -253,9 +252,9 @@ func TestDelete(t *testing.T) {
 }
 
 func TestDeleteCollection(t *testing.T) {
-	statusOK := &metav1.Status{
-		TypeMeta: metav1.TypeMeta{Kind: "Status"},
-		Status:   metav1.StatusSuccess,
+	statusOK := &unversioned.Status{
+		TypeMeta: unversioned.TypeMeta{Kind: "Status"},
+		Status:   unversioned.StatusSuccess,
 	}
 	tcs := []struct {
 		namespace string
@@ -273,8 +272,8 @@ func TestDeleteCollection(t *testing.T) {
 		},
 	}
 	for _, tc := range tcs {
-		gv := &schema.GroupVersion{Group: "gtest", Version: "vtest"}
-		resource := &metav1.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
+		gv := &unversioned.GroupVersion{Group: "gtest", Version: "vtest"}
+		resource := &unversioned.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
 		cl, srv, err := getClientServer(gv, func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != "DELETE" {
 				t.Errorf("DeleteCollection(%q) got HTTP method %s. wanted DELETE", tc.name, r.Method)
@@ -321,8 +320,8 @@ func TestCreate(t *testing.T) {
 		},
 	}
 	for _, tc := range tcs {
-		gv := &schema.GroupVersion{Group: "gtest", Version: "vtest"}
-		resource := &metav1.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
+		gv := &unversioned.GroupVersion{Group: "gtest", Version: "vtest"}
+		resource := &unversioned.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
 		cl, srv, err := getClientServer(gv, func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != "POST" {
 				t.Errorf("Create(%q) got HTTP method %s. wanted POST", tc.name, r.Method)
@@ -380,8 +379,8 @@ func TestUpdate(t *testing.T) {
 		},
 	}
 	for _, tc := range tcs {
-		gv := &schema.GroupVersion{Group: "gtest", Version: "vtest"}
-		resource := &metav1.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
+		gv := &unversioned.GroupVersion{Group: "gtest", Version: "vtest"}
+		resource := &unversioned.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
 		cl, srv, err := getClientServer(gv, func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != "PUT" {
 				t.Errorf("Update(%q) got HTTP method %s. wanted PUT", tc.name, r.Method)
@@ -447,8 +446,8 @@ func TestWatch(t *testing.T) {
 		},
 	}
 	for _, tc := range tcs {
-		gv := &schema.GroupVersion{Group: "gtest", Version: "vtest"}
-		resource := &metav1.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
+		gv := &unversioned.GroupVersion{Group: "gtest", Version: "vtest"}
+		resource := &unversioned.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
 		cl, srv, err := getClientServer(gv, func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != "GET" {
 				t.Errorf("Watch(%q) got HTTP method %s. wanted GET", tc.name, r.Method)
@@ -507,8 +506,8 @@ func TestPatch(t *testing.T) {
 		},
 	}
 	for _, tc := range tcs {
-		gv := &schema.GroupVersion{Group: "gtest", Version: "vtest"}
-		resource := &metav1.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
+		gv := &unversioned.GroupVersion{Group: "gtest", Version: "vtest"}
+		resource := &unversioned.APIResource{Name: "rtest", Namespaced: len(tc.namespace) != 0}
 		cl, srv, err := getClientServer(gv, func(w http.ResponseWriter, r *http.Request) {
 			if r.Method != "PATCH" {
 				t.Errorf("Patch(%q) got HTTP method %s. wanted PATCH", tc.name, r.Method)

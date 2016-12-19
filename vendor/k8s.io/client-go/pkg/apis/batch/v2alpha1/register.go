@@ -17,9 +17,9 @@ limitations under the License.
 package v2alpha1
 
 import (
+	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/runtime"
-	"k8s.io/client-go/pkg/runtime/schema"
 	versionedwatch "k8s.io/client-go/pkg/watch/versioned"
 )
 
@@ -27,12 +27,7 @@ import (
 const GroupName = "batch"
 
 // SchemeGroupVersion is group version used to register these objects
-var SchemeGroupVersion = schema.GroupVersion{Group: GroupName, Version: "v2alpha1"}
-
-// Resource takes an unqualified resource and returns a Group qualified GroupResource
-func Resource(resource string) schema.GroupResource {
-	return SchemeGroupVersion.WithResource(resource).GroupResource()
-}
+var SchemeGroupVersion = unversioned.GroupVersion{Group: GroupName, Version: "v2alpha1"}
 
 var (
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes, addDefaultingFuncs, addConversionFuncs)
@@ -45,13 +40,11 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&Job{},
 		&JobList{},
 		&JobTemplate{},
-		&CronJob{},
-		&CronJobList{},
+		&ScheduledJob{},
+		&ScheduledJobList{},
 		&v1.ListOptions{},
 		&v1.DeleteOptions{},
 	)
-	scheme.AddKnownTypeWithName(SchemeGroupVersion.WithKind("ScheduledJob"), &CronJob{})
-	scheme.AddKnownTypeWithName(SchemeGroupVersion.WithKind("ScheduledJobList"), &CronJobList{})
 	versionedwatch.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }

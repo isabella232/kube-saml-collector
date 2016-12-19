@@ -21,10 +21,9 @@ import (
 	"reflect"
 
 	"k8s.io/client-go/pkg/api/meta/metatypes"
-	metav1 "k8s.io/client-go/pkg/apis/meta/v1"
+	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/conversion"
 	"k8s.io/client-go/pkg/runtime"
-	"k8s.io/client-go/pkg/runtime/schema"
 	"k8s.io/client-go/pkg/types"
 
 	"github.com/golang/glog"
@@ -43,14 +42,14 @@ func ListAccessor(obj interface{}) (List, error) {
 	switch t := obj.(type) {
 	case List:
 		return t, nil
-	case metav1.List:
+	case unversioned.List:
 		return t, nil
 	case ListMetaAccessor:
 		if m := t.GetListMeta(); m != nil {
 			return m, nil
 		}
 		return nil, errNotList
-	case metav1.ListMetaAccessor:
+	case unversioned.ListMetaAccessor:
 		if m := t.GetListMeta(); m != nil {
 			return m, nil
 		}
@@ -85,7 +84,7 @@ func Accessor(obj interface{}) (Object, error) {
 			return m, nil
 		}
 		return nil, errNotObject
-	case List, metav1.List, ListMetaAccessor, metav1.ListMetaAccessor:
+	case List, unversioned.List, ListMetaAccessor, unversioned.ListMetaAccessor:
 		return nil, errNotObject
 	default:
 		return nil, errNotObject
@@ -141,9 +140,9 @@ func (obj objectAccessor) GetAPIVersion() string {
 
 func (obj objectAccessor) SetAPIVersion(version string) {
 	gvk := obj.GetObjectKind().GroupVersionKind()
-	gv, err := schema.ParseGroupVersion(version)
+	gv, err := unversioned.ParseGroupVersion(version)
 	if err != nil {
-		gv = schema.GroupVersion{Version: version}
+		gv = unversioned.GroupVersion{Version: version}
 	}
 	gvk.Group, gvk.Version = gv.Group, gv.Version
 	obj.GetObjectKind().SetGroupVersionKind(gvk)
@@ -372,8 +371,8 @@ type genericAccessor struct {
 	kind              *string
 	resourceVersion   *string
 	selfLink          *string
-	creationTimestamp *metav1.Time
-	deletionTimestamp **metav1.Time
+	creationTimestamp *unversioned.Time
+	deletionTimestamp **unversioned.Time
 	labels            *map[string]string
 	annotations       *map[string]string
 	ownerReferences   reflect.Value
@@ -468,19 +467,19 @@ func (a genericAccessor) SetSelfLink(selfLink string) {
 	*a.selfLink = selfLink
 }
 
-func (a genericAccessor) GetCreationTimestamp() metav1.Time {
+func (a genericAccessor) GetCreationTimestamp() unversioned.Time {
 	return *a.creationTimestamp
 }
 
-func (a genericAccessor) SetCreationTimestamp(timestamp metav1.Time) {
+func (a genericAccessor) SetCreationTimestamp(timestamp unversioned.Time) {
 	*a.creationTimestamp = timestamp
 }
 
-func (a genericAccessor) GetDeletionTimestamp() *metav1.Time {
+func (a genericAccessor) GetDeletionTimestamp() *unversioned.Time {
 	return *a.deletionTimestamp
 }
 
-func (a genericAccessor) SetDeletionTimestamp(timestamp *metav1.Time) {
+func (a genericAccessor) SetDeletionTimestamp(timestamp *unversioned.Time) {
 	*a.deletionTimestamp = timestamp
 }
 

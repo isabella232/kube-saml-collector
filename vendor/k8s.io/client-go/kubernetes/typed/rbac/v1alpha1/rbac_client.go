@@ -17,15 +17,13 @@ limitations under the License.
 package v1alpha1
 
 import (
-	fmt "fmt"
 	api "k8s.io/client-go/pkg/api"
 	registered "k8s.io/client-go/pkg/apimachinery/registered"
-	schema "k8s.io/client-go/pkg/runtime/schema"
 	serializer "k8s.io/client-go/pkg/runtime/serializer"
 	rest "k8s.io/client-go/rest"
 )
 
-type RbacV1alpha1Interface interface {
+type RbacInterface interface {
 	RESTClient() rest.Interface
 	ClusterRolesGetter
 	ClusterRoleBindingsGetter
@@ -33,29 +31,29 @@ type RbacV1alpha1Interface interface {
 	RoleBindingsGetter
 }
 
-// RbacV1alpha1Client is used to interact with features provided by the k8s.io/kubernetes/pkg/apimachinery/registered.Group group.
-type RbacV1alpha1Client struct {
+// RbacClient is used to interact with features provided by the Rbac group.
+type RbacClient struct {
 	restClient rest.Interface
 }
 
-func (c *RbacV1alpha1Client) ClusterRoles() ClusterRoleInterface {
+func (c *RbacClient) ClusterRoles() ClusterRoleInterface {
 	return newClusterRoles(c)
 }
 
-func (c *RbacV1alpha1Client) ClusterRoleBindings() ClusterRoleBindingInterface {
+func (c *RbacClient) ClusterRoleBindings() ClusterRoleBindingInterface {
 	return newClusterRoleBindings(c)
 }
 
-func (c *RbacV1alpha1Client) Roles(namespace string) RoleInterface {
+func (c *RbacClient) Roles(namespace string) RoleInterface {
 	return newRoles(c, namespace)
 }
 
-func (c *RbacV1alpha1Client) RoleBindings(namespace string) RoleBindingInterface {
+func (c *RbacClient) RoleBindings(namespace string) RoleBindingInterface {
 	return newRoleBindings(c, namespace)
 }
 
-// NewForConfig creates a new RbacV1alpha1Client for the given config.
-func NewForConfig(c *rest.Config) (*RbacV1alpha1Client, error) {
+// NewForConfig creates a new RbacClient for the given config.
+func NewForConfig(c *rest.Config) (*RbacClient, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -64,12 +62,12 @@ func NewForConfig(c *rest.Config) (*RbacV1alpha1Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &RbacV1alpha1Client{client}, nil
+	return &RbacClient{client}, nil
 }
 
-// NewForConfigOrDie creates a new RbacV1alpha1Client for the given config and
+// NewForConfigOrDie creates a new RbacClient for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *RbacV1alpha1Client {
+func NewForConfigOrDie(c *rest.Config) *RbacClient {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -77,26 +75,26 @@ func NewForConfigOrDie(c *rest.Config) *RbacV1alpha1Client {
 	return client
 }
 
-// New creates a new RbacV1alpha1Client for the given RESTClient.
-func New(c rest.Interface) *RbacV1alpha1Client {
-	return &RbacV1alpha1Client{c}
+// New creates a new RbacClient for the given RESTClient.
+func New(c rest.Interface) *RbacClient {
+	return &RbacClient{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
-	gv, err := schema.ParseGroupVersion("rbac.authorization.k8s.io/v1alpha1")
+	// if rbac group is not registered, return an error
+	g, err := registered.Group("rbac.authorization.k8s.io")
 	if err != nil {
 		return err
-	}
-	// if rbac.authorization.k8s.io/v1alpha1 is not enabled, return an error
-	if !registered.IsEnabledVersion(gv) {
-		return fmt.Errorf("rbac.authorization.k8s.io/v1alpha1 is not enabled")
 	}
 	config.APIPath = "/apis"
 	if config.UserAgent == "" {
 		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}
-	copyGroupVersion := gv
+	// TODO: Unconditionally set the config.Version, until we fix the config.
+	//if config.Version == "" {
+	copyGroupVersion := g.GroupVersion
 	config.GroupVersion = &copyGroupVersion
+	//}
 
 	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: api.Codecs}
 
@@ -105,7 +103,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *RbacV1alpha1Client) RESTClient() rest.Interface {
+func (c *RbacClient) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

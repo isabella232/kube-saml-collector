@@ -15,6 +15,8 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"flag"
 	"fmt"
 	"net/http"
@@ -69,6 +71,14 @@ func main() {
 	default:
 		cfg = &rest.Config{
 			Host: *host,
+		}
+	}
+
+	if os.Getenv("ROOT_CA") != "" {
+		cp := x509.NewCertPool()
+		cp.AppendCertsFromPEM([]byte(os.Getenv("ROOT_CA")))
+		cfg.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{RootCAs: cp},
 		}
 	}
 

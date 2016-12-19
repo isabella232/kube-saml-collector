@@ -18,20 +18,20 @@ package fake
 
 import (
 	api "k8s.io/client-go/pkg/api"
+	unversioned "k8s.io/client-go/pkg/api/unversioned"
 	v1 "k8s.io/client-go/pkg/api/v1"
 	labels "k8s.io/client-go/pkg/labels"
-	schema "k8s.io/client-go/pkg/runtime/schema"
 	watch "k8s.io/client-go/pkg/watch"
 	testing "k8s.io/client-go/testing"
 )
 
 // FakeLimitRanges implements LimitRangeInterface
 type FakeLimitRanges struct {
-	Fake *FakeCoreV1
+	Fake *FakeCore
 	ns   string
 }
 
-var limitrangesResource = schema.GroupVersionResource{Group: "", Version: "v1", Resource: "limitranges"}
+var limitrangesResource = unversioned.GroupVersionResource{Group: "", Version: "v1", Resource: "limitranges"}
 
 func (c *FakeLimitRanges) Create(limitRange *v1.LimitRange) (result *v1.LimitRange, err error) {
 	obj, err := c.Fake.

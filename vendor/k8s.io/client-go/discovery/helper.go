@@ -19,10 +19,10 @@ package discovery
 import (
 	"fmt"
 
-	metav1 "k8s.io/client-go/pkg/apis/meta/v1"
-	"k8s.io/client-go/pkg/runtime/schema"
+	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/util/sets"
 	"k8s.io/client-go/pkg/version"
+	"k8s.io/client-go/rest"
 	// Import solely to initialize client auth plugins.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
@@ -30,7 +30,14 @@ import (
 // MatchesServerVersion queries the server to compares the build version
 // (git hash) of the client with the server's build version. It returns an error
 // if it failed to contact the server or if the versions are not an exact match.
-func MatchesServerVersion(client DiscoveryInterface) error {
+func MatchesServerVersion(client DiscoveryInterface, c *rest.Config) error {
+	var err error
+	if client == nil {
+		client, err = NewDiscoveryClientForConfig(c)
+		if err != nil {
+			return err
+		}
+	}
 	cVer := version.Get()
 	sVer, err := client.ServerVersion()
 	if err != nil {
@@ -48,9 +55,19 @@ func MatchesServerVersion(client DiscoveryInterface) error {
 // a version that both client and server support.
 // - If no version is provided, try registered client versions in order of
 //   preference.
-// - If version is provided and the server does not support it,
+// - If version is provided, but not default config (explicitly requested via
+//   commandline flag), and is unsupported by the server, print a warning to
+//   stderr and try client's registered versions in order of preference.
+// - If version is config default, and the server does not support it,
 //   return an error.
-func NegotiateVersion(client DiscoveryInterface, requiredGV *schema.GroupVersion, clientRegisteredGVs []schema.GroupVersion) (*schema.GroupVersion, error) {
+func NegotiateVersion(client DiscoveryInterface, c *rest.Config, requestedGV *unversioned.GroupVersion, clientRegisteredGVs []unversioned.GroupVersion) (*unversioned.GroupVersion, error) {
+	var err error
+	if client == nil {
+		client, err = NewDiscoveryClientForConfig(c)
+		if err != nil {
+			return nil, err
+		}
+	}
 	clientVersions := sets.String{}
 	for _, gv := range clientRegisteredGVs {
 		clientVersions.Insert(gv.String())
@@ -61,29 +78,43 @@ func NegotiateVersion(client DiscoveryInterface, requiredGV *schema.GroupVersion
 		// not a negotiation specific error.
 		return nil, err
 	}
-	versions := metav1.ExtractGroupVersions(groups)
+	versions := unversioned.ExtractGroupVersions(groups)
 	serverVersions := sets.String{}
 	for _, v := range versions {
 		serverVersions.Insert(v)
 	}
 
+	// If no version requested, use config version (may also be empty).
+	// make a copy of the original so we don't risk mutating input here or in the returned value
+	var preferredGV *unversioned.GroupVersion
+	switch {
+	case requestedGV != nil:
+		t := *requestedGV
+		preferredGV = &t
+	case c.GroupVersion != nil:
+		t := *c.GroupVersion
+		preferredGV = &t
+	}
+
 	// If version explicitly requested verify that both client and server support it.
 	// If server does not support warn, but try to negotiate a lower version.
-	if requiredGV != nil {
-		if !clientVersions.Has(requiredGV.String()) {
-			return nil, fmt.Errorf("client does not support API version %q; client supported API versions: %v", requiredGV, clientVersions)
+	if preferredGV != nil {
+		if !clientVersions.Has(preferredGV.String()) {
+			return nil, fmt.Errorf("client does not support API version %q; client supported API versions: %v", preferredGV, clientVersions)
 
 		}
 		// If the server supports no versions, then we should just use the preferredGV
 		// This can happen because discovery fails due to 403 Forbidden errors
 		if len(serverVersions) == 0 {
-			return requiredGV, nil
+			return preferredGV, nil
 		}
-		if serverVersions.Has(requiredGV.String()) {
-			return requiredGV, nil
+		if serverVersions.Has(preferredGV.String()) {
+			return preferredGV, nil
 		}
 		// If we are using an explicit config version the server does not support, fail.
-		return nil, fmt.Errorf("server does not support API version %q", requiredGV)
+		if (c.GroupVersion != nil) && (*preferredGV == *c.GroupVersion) {
+			return nil, fmt.Errorf("server does not support API version %q", preferredGV)
+		}
 	}
 
 	for _, clientGV := range clientRegisteredGVs {
@@ -99,12 +130,6 @@ func NegotiateVersion(client DiscoveryInterface, requiredGV *schema.GroupVersion
 			return &t, nil
 		}
 	}
-
-	// if we have no server versions and we have no required version, choose the first clientRegisteredVersion
-	if len(serverVersions) == 0 && len(clientRegisteredGVs) > 0 {
-		return &clientRegisteredGVs[0], nil
-	}
-
 	return nil, fmt.Errorf("failed to negotiate an api version; server supports: %v, client supports: %v",
 		serverVersions, clientVersions)
 }

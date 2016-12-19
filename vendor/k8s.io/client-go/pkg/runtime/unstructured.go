@@ -27,8 +27,7 @@ import (
 	"github.com/golang/glog"
 
 	"k8s.io/client-go/pkg/api/meta/metatypes"
-	metav1 "k8s.io/client-go/pkg/apis/meta/v1"
-	"k8s.io/client-go/pkg/runtime/schema"
+	"k8s.io/client-go/pkg/api/unversioned"
 	"k8s.io/client-go/pkg/types"
 	"k8s.io/client-go/pkg/util/json"
 )
@@ -287,19 +286,19 @@ func (u *Unstructured) SetSelfLink(selfLink string) {
 	u.setNestedField(selfLink, "metadata", "selfLink")
 }
 
-func (u *Unstructured) GetCreationTimestamp() metav1.Time {
-	var timestamp metav1.Time
+func (u *Unstructured) GetCreationTimestamp() unversioned.Time {
+	var timestamp unversioned.Time
 	timestamp.UnmarshalQueryParameter(getNestedString(u.Object, "metadata", "creationTimestamp"))
 	return timestamp
 }
 
-func (u *Unstructured) SetCreationTimestamp(timestamp metav1.Time) {
+func (u *Unstructured) SetCreationTimestamp(timestamp unversioned.Time) {
 	ts, _ := timestamp.MarshalQueryParameter()
 	u.setNestedField(ts, "metadata", "creationTimestamp")
 }
 
-func (u *Unstructured) GetDeletionTimestamp() *metav1.Time {
-	var timestamp metav1.Time
+func (u *Unstructured) GetDeletionTimestamp() *unversioned.Time {
+	var timestamp unversioned.Time
 	timestamp.UnmarshalQueryParameter(getNestedString(u.Object, "metadata", "deletionTimestamp"))
 	if timestamp.IsZero() {
 		return nil
@@ -307,7 +306,7 @@ func (u *Unstructured) GetDeletionTimestamp() *metav1.Time {
 	return &timestamp
 }
 
-func (u *Unstructured) SetDeletionTimestamp(timestamp *metav1.Time) {
+func (u *Unstructured) SetDeletionTimestamp(timestamp *unversioned.Time) {
 	ts, _ := timestamp.MarshalQueryParameter()
 	u.setNestedField(ts, "metadata", "deletionTimestamp")
 }
@@ -328,15 +327,15 @@ func (u *Unstructured) SetAnnotations(annotations map[string]string) {
 	u.setNestedMap(annotations, "metadata", "annotations")
 }
 
-func (u *Unstructured) SetGroupVersionKind(gvk schema.GroupVersionKind) {
+func (u *Unstructured) SetGroupVersionKind(gvk unversioned.GroupVersionKind) {
 	u.SetAPIVersion(gvk.GroupVersion().String())
 	u.SetKind(gvk.Kind)
 }
 
-func (u *Unstructured) GroupVersionKind() schema.GroupVersionKind {
-	gv, err := schema.ParseGroupVersion(u.GetAPIVersion())
+func (u *Unstructured) GroupVersionKind() unversioned.GroupVersionKind {
+	gv, err := unversioned.ParseGroupVersion(u.GetAPIVersion())
 	if err != nil {
-		return schema.GroupVersionKind{}
+		return unversioned.GroupVersionKind{}
 	}
 	gvk := gv.WithKind(u.GetKind())
 	return gvk
@@ -422,15 +421,15 @@ func (u *UnstructuredList) SetSelfLink(selfLink string) {
 	u.setNestedField(selfLink, "metadata", "selfLink")
 }
 
-func (u *UnstructuredList) SetGroupVersionKind(gvk schema.GroupVersionKind) {
+func (u *UnstructuredList) SetGroupVersionKind(gvk unversioned.GroupVersionKind) {
 	u.SetAPIVersion(gvk.GroupVersion().String())
 	u.SetKind(gvk.Kind)
 }
 
-func (u *UnstructuredList) GroupVersionKind() schema.GroupVersionKind {
-	gv, err := schema.ParseGroupVersion(u.GetAPIVersion())
+func (u *UnstructuredList) GroupVersionKind() unversioned.GroupVersionKind {
+	gv, err := unversioned.ParseGroupVersion(u.GetAPIVersion())
 	if err != nil {
-		return schema.GroupVersionKind{}
+		return unversioned.GroupVersionKind{}
 	}
 	gvk := gv.WithKind(u.GetKind())
 	return gvk
@@ -443,7 +442,7 @@ var UnstructuredJSONScheme Codec = unstructuredJSONScheme{}
 
 type unstructuredJSONScheme struct{}
 
-func (s unstructuredJSONScheme) Decode(data []byte, _ *schema.GroupVersionKind, obj Object) (Object, *schema.GroupVersionKind, error) {
+func (s unstructuredJSONScheme) Decode(data []byte, _ *unversioned.GroupVersionKind, obj Object) (Object, *unversioned.GroupVersionKind, error) {
 	var err error
 	if obj != nil {
 		err = s.decodeInto(data, obj)
@@ -598,7 +597,7 @@ func (UnstructuredObjectConverter) Convert(in, out, context interface{}) error {
 
 func (UnstructuredObjectConverter) ConvertToVersion(in Object, target GroupVersioner) (Object, error) {
 	if kind := in.GetObjectKind().GroupVersionKind(); !kind.Empty() {
-		gvk, ok := target.KindForGroupVersionKinds([]schema.GroupVersionKind{kind})
+		gvk, ok := target.KindForGroupVersionKinds([]unversioned.GroupVersionKind{kind})
 		if !ok {
 			// TODO: should this be a typed error?
 			return nil, fmt.Errorf("%v is unstructured and is not suitable for converting to %q", kind, target)

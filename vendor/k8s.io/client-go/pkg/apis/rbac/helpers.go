@@ -21,11 +21,11 @@ import (
 	"strings"
 
 	"k8s.io/client-go/pkg/api"
-	"k8s.io/client-go/pkg/runtime/schema"
+	"k8s.io/client-go/pkg/api/unversioned"
 )
 
-func RoleRefGroupKind(roleRef RoleRef) schema.GroupKind {
-	return schema.GroupKind{Group: roleRef.APIGroup, Kind: roleRef.Kind}
+func RoleRefGroupKind(roleRef RoleRef) unversioned.GroupKind {
+	return unversioned.GroupKind{Group: roleRef.APIGroup, Kind: roleRef.Kind}
 }
 
 func VerbMatches(rule PolicyRule, requestedVerb string) bool {
@@ -95,32 +95,6 @@ func NonResourceURLMatches(rule PolicyRule, requestedURL string) bool {
 	}
 
 	return false
-}
-
-// subjectsStrings returns users, groups, serviceaccounts, unknown for display purposes.
-func SubjectsStrings(subjects []Subject) ([]string, []string, []string, []string) {
-	users := []string{}
-	groups := []string{}
-	sas := []string{}
-	others := []string{}
-
-	for _, subject := range subjects {
-		switch subject.Kind {
-		case ServiceAccountKind:
-			sas = append(sas, fmt.Sprintf("%s/%s", subject.Namespace, subject.Name))
-
-		case UserKind:
-			users = append(users, subject.Name)
-
-		case GroupKind:
-			groups = append(groups, subject.Name)
-
-		default:
-			others = append(others, fmt.Sprintf("%s/%s/%s", subject.Kind, subject.Namespace, subject.Name))
-		}
-	}
-
-	return users, groups, sas, others
 }
 
 // +k8s:deepcopy-gen=false

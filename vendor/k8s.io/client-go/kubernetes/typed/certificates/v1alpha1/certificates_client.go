@@ -17,30 +17,28 @@ limitations under the License.
 package v1alpha1
 
 import (
-	fmt "fmt"
 	api "k8s.io/client-go/pkg/api"
 	registered "k8s.io/client-go/pkg/apimachinery/registered"
-	schema "k8s.io/client-go/pkg/runtime/schema"
 	serializer "k8s.io/client-go/pkg/runtime/serializer"
 	rest "k8s.io/client-go/rest"
 )
 
-type CertificatesV1alpha1Interface interface {
+type CertificatesInterface interface {
 	RESTClient() rest.Interface
 	CertificateSigningRequestsGetter
 }
 
-// CertificatesV1alpha1Client is used to interact with features provided by the k8s.io/kubernetes/pkg/apimachinery/registered.Group group.
-type CertificatesV1alpha1Client struct {
+// CertificatesClient is used to interact with features provided by the Certificates group.
+type CertificatesClient struct {
 	restClient rest.Interface
 }
 
-func (c *CertificatesV1alpha1Client) CertificateSigningRequests() CertificateSigningRequestInterface {
+func (c *CertificatesClient) CertificateSigningRequests() CertificateSigningRequestInterface {
 	return newCertificateSigningRequests(c)
 }
 
-// NewForConfig creates a new CertificatesV1alpha1Client for the given config.
-func NewForConfig(c *rest.Config) (*CertificatesV1alpha1Client, error) {
+// NewForConfig creates a new CertificatesClient for the given config.
+func NewForConfig(c *rest.Config) (*CertificatesClient, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
@@ -49,12 +47,12 @@ func NewForConfig(c *rest.Config) (*CertificatesV1alpha1Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &CertificatesV1alpha1Client{client}, nil
+	return &CertificatesClient{client}, nil
 }
 
-// NewForConfigOrDie creates a new CertificatesV1alpha1Client for the given config and
+// NewForConfigOrDie creates a new CertificatesClient for the given config and
 // panics if there is an error in the config.
-func NewForConfigOrDie(c *rest.Config) *CertificatesV1alpha1Client {
+func NewForConfigOrDie(c *rest.Config) *CertificatesClient {
 	client, err := NewForConfig(c)
 	if err != nil {
 		panic(err)
@@ -62,26 +60,26 @@ func NewForConfigOrDie(c *rest.Config) *CertificatesV1alpha1Client {
 	return client
 }
 
-// New creates a new CertificatesV1alpha1Client for the given RESTClient.
-func New(c rest.Interface) *CertificatesV1alpha1Client {
-	return &CertificatesV1alpha1Client{c}
+// New creates a new CertificatesClient for the given RESTClient.
+func New(c rest.Interface) *CertificatesClient {
+	return &CertificatesClient{c}
 }
 
 func setConfigDefaults(config *rest.Config) error {
-	gv, err := schema.ParseGroupVersion("certificates.k8s.io/v1alpha1")
+	// if certificates group is not registered, return an error
+	g, err := registered.Group("certificates.k8s.io")
 	if err != nil {
 		return err
-	}
-	// if certificates.k8s.io/v1alpha1 is not enabled, return an error
-	if !registered.IsEnabledVersion(gv) {
-		return fmt.Errorf("certificates.k8s.io/v1alpha1 is not enabled")
 	}
 	config.APIPath = "/apis"
 	if config.UserAgent == "" {
 		config.UserAgent = rest.DefaultKubernetesUserAgent()
 	}
-	copyGroupVersion := gv
+	// TODO: Unconditionally set the config.Version, until we fix the config.
+	//if config.Version == "" {
+	copyGroupVersion := g.GroupVersion
 	config.GroupVersion = &copyGroupVersion
+	//}
 
 	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: api.Codecs}
 
@@ -90,7 +88,7 @@ func setConfigDefaults(config *rest.Config) error {
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *CertificatesV1alpha1Client) RESTClient() rest.Interface {
+func (c *CertificatesClient) RESTClient() rest.Interface {
 	if c == nil {
 		return nil
 	}

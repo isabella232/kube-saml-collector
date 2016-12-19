@@ -21,7 +21,7 @@ limitations under the License.
 package v1
 
 import (
-	meta_v1 "k8s.io/client-go/pkg/apis/meta/v1"
+	unversioned "k8s.io/client-go/pkg/api/unversioned"
 	conversion "k8s.io/client-go/pkg/conversion"
 	runtime "k8s.io/client-go/pkg/runtime"
 	types "k8s.io/client-go/pkg/types"
@@ -77,6 +77,7 @@ func RegisterDeepCopies(scheme *runtime.Scheme) error {
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_EventList, InType: reflect.TypeOf(&EventList{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_EventSource, InType: reflect.TypeOf(&EventSource{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_ExecAction, InType: reflect.TypeOf(&ExecAction{})},
+		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_ExportOptions, InType: reflect.TypeOf(&ExportOptions{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_FCVolumeSource, InType: reflect.TypeOf(&FCVolumeSource{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_FlexVolumeSource, InType: reflect.TypeOf(&FlexVolumeSource{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_FlockerVolumeSource, InType: reflect.TypeOf(&FlockerVolumeSource{})},
@@ -111,7 +112,6 @@ func RegisterDeepCopies(scheme *runtime.Scheme) error {
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_NodeDaemonEndpoints, InType: reflect.TypeOf(&NodeDaemonEndpoints{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_NodeList, InType: reflect.TypeOf(&NodeList{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_NodeProxyOptions, InType: reflect.TypeOf(&NodeProxyOptions{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_NodeResources, InType: reflect.TypeOf(&NodeResources{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_NodeSelector, InType: reflect.TypeOf(&NodeSelector{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_NodeSelectorRequirement, InType: reflect.TypeOf(&NodeSelectorRequirement{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_NodeSelectorTerm, InType: reflect.TypeOf(&NodeSelectorTerm{})},
@@ -132,7 +132,6 @@ func RegisterDeepCopies(scheme *runtime.Scheme) error {
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_PersistentVolumeSource, InType: reflect.TypeOf(&PersistentVolumeSource{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_PersistentVolumeSpec, InType: reflect.TypeOf(&PersistentVolumeSpec{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_PersistentVolumeStatus, InType: reflect.TypeOf(&PersistentVolumeStatus{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_PhotonPersistentDiskVolumeSource, InType: reflect.TypeOf(&PhotonPersistentDiskVolumeSource{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_Pod, InType: reflect.TypeOf(&Pod{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_PodAffinity, InType: reflect.TypeOf(&PodAffinity{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_PodAffinityTerm, InType: reflect.TypeOf(&PodAffinityTerm{})},
@@ -184,7 +183,6 @@ func RegisterDeepCopies(scheme *runtime.Scheme) error {
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_ServiceProxyOptions, InType: reflect.TypeOf(&ServiceProxyOptions{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_ServiceSpec, InType: reflect.TypeOf(&ServiceSpec{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_ServiceStatus, InType: reflect.TypeOf(&ServiceStatus{})},
-		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_Sysctl, InType: reflect.TypeOf(&Sysctl{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_TCPSocketAction, InType: reflect.TypeOf(&TCPSocketAction{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_Taint, InType: reflect.TypeOf(&Taint{})},
 		conversion.GeneratedDeepCopyFunc{Fn: DeepCopy_v1_Toleration, InType: reflect.TypeOf(&Toleration{})},
@@ -1086,6 +1084,17 @@ func DeepCopy_v1_ExecAction(in interface{}, out interface{}, c *conversion.Clone
 	}
 }
 
+func DeepCopy_v1_ExportOptions(in interface{}, out interface{}, c *conversion.Cloner) error {
+	{
+		in := in.(*ExportOptions)
+		out := out.(*ExportOptions)
+		out.TypeMeta = in.TypeMeta
+		out.Export = in.Export
+		out.Exact = in.Exact
+		return nil
+	}
+}
+
 func DeepCopy_v1_FCVolumeSource(in interface{}, out interface{}, c *conversion.Cloner) error {
 	{
 		in := in.(*FCVolumeSource)
@@ -1679,23 +1688,6 @@ func DeepCopy_v1_NodeProxyOptions(in interface{}, out interface{}, c *conversion
 	}
 }
 
-func DeepCopy_v1_NodeResources(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*NodeResources)
-		out := out.(*NodeResources)
-		if in.Capacity != nil {
-			in, out := &in.Capacity, &out.Capacity
-			*out = make(ResourceList)
-			for key, val := range *in {
-				(*out)[key] = val.DeepCopy()
-			}
-		} else {
-			out.Capacity = nil
-		}
-		return nil
-	}
-}
-
 func DeepCopy_v1_NodeSelector(in interface{}, out interface{}, c *conversion.Cloner) error {
 	{
 		in := in.(*NodeSelector)
@@ -1883,7 +1875,7 @@ func DeepCopy_v1_ObjectMeta(in interface{}, out interface{}, c *conversion.Clone
 		out.CreationTimestamp = in.CreationTimestamp.DeepCopy()
 		if in.DeletionTimestamp != nil {
 			in, out := &in.DeletionTimestamp, &out.DeletionTimestamp
-			*out = new(meta_v1.Time)
+			*out = new(unversioned.Time)
 			**out = (*in).DeepCopy()
 		} else {
 			out.DeletionTimestamp = nil
@@ -2040,8 +2032,8 @@ func DeepCopy_v1_PersistentVolumeClaimSpec(in interface{}, out interface{}, c *c
 		}
 		if in.Selector != nil {
 			in, out := &in.Selector, &out.Selector
-			*out = new(meta_v1.LabelSelector)
-			if err := meta_v1.DeepCopy_v1_LabelSelector(*in, *out, c); err != nil {
+			*out = new(unversioned.LabelSelector)
+			if err := unversioned.DeepCopy_unversioned_LabelSelector(*in, *out, c); err != nil {
 				return err
 			}
 		} else {
@@ -2239,13 +2231,6 @@ func DeepCopy_v1_PersistentVolumeSource(in interface{}, out interface{}, c *conv
 		} else {
 			out.AzureDisk = nil
 		}
-		if in.PhotonPersistentDisk != nil {
-			in, out := &in.PhotonPersistentDisk, &out.PhotonPersistentDisk
-			*out = new(PhotonPersistentDiskVolumeSource)
-			**out = **in
-		} else {
-			out.PhotonPersistentDisk = nil
-		}
 		return nil
 	}
 }
@@ -2294,16 +2279,6 @@ func DeepCopy_v1_PersistentVolumeStatus(in interface{}, out interface{}, c *conv
 		out.Phase = in.Phase
 		out.Message = in.Message
 		out.Reason = in.Reason
-		return nil
-	}
-}
-
-func DeepCopy_v1_PhotonPersistentDiskVolumeSource(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*PhotonPersistentDiskVolumeSource)
-		out := out.(*PhotonPersistentDiskVolumeSource)
-		out.PdID = in.PdID
-		out.FSType = in.FSType
 		return nil
 	}
 }
@@ -2362,8 +2337,8 @@ func DeepCopy_v1_PodAffinityTerm(in interface{}, out interface{}, c *conversion.
 		out := out.(*PodAffinityTerm)
 		if in.LabelSelector != nil {
 			in, out := &in.LabelSelector, &out.LabelSelector
-			*out = new(meta_v1.LabelSelector)
-			if err := meta_v1.DeepCopy_v1_LabelSelector(*in, *out, c); err != nil {
+			*out = new(unversioned.LabelSelector)
+			if err := unversioned.DeepCopy_unversioned_LabelSelector(*in, *out, c); err != nil {
 				return err
 			}
 		} else {
@@ -2498,7 +2473,7 @@ func DeepCopy_v1_PodLogOptions(in interface{}, out interface{}, c *conversion.Cl
 		}
 		if in.SinceTime != nil {
 			in, out := &in.SinceTime, &out.SinceTime
-			*out = new(meta_v1.Time)
+			*out = new(unversioned.Time)
 			**out = (*in).DeepCopy()
 		} else {
 			out.SinceTime = nil
@@ -2706,7 +2681,7 @@ func DeepCopy_v1_PodStatus(in interface{}, out interface{}, c *conversion.Cloner
 		out.PodIP = in.PodIP
 		if in.StartTime != nil {
 			in, out := &in.StartTime, &out.StartTime
-			*out = new(meta_v1.Time)
+			*out = new(unversioned.Time)
 			**out = (*in).DeepCopy()
 		} else {
 			out.StartTime = nil
@@ -3501,16 +3476,6 @@ func DeepCopy_v1_ServiceStatus(in interface{}, out interface{}, c *conversion.Cl
 	}
 }
 
-func DeepCopy_v1_Sysctl(in interface{}, out interface{}, c *conversion.Cloner) error {
-	{
-		in := in.(*Sysctl)
-		out := out.(*Sysctl)
-		out.Name = in.Name
-		out.Value = in.Value
-		return nil
-	}
-}
-
 func DeepCopy_v1_TCPSocketAction(in interface{}, out interface{}, c *conversion.Cloner) error {
 	{
 		in := in.(*TCPSocketAction)
@@ -3740,13 +3705,6 @@ func DeepCopy_v1_VolumeSource(in interface{}, out interface{}, c *conversion.Clo
 			}
 		} else {
 			out.AzureDisk = nil
-		}
-		if in.PhotonPersistentDisk != nil {
-			in, out := &in.PhotonPersistentDisk, &out.PhotonPersistentDisk
-			*out = new(PhotonPersistentDiskVolumeSource)
-			**out = **in
-		} else {
-			out.PhotonPersistentDisk = nil
 		}
 		return nil
 	}

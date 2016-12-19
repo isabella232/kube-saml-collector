@@ -24,7 +24,6 @@ import (
 	certificates "k8s.io/client-go/pkg/apis/certificates"
 	conversion "k8s.io/client-go/pkg/conversion"
 	runtime "k8s.io/client-go/pkg/runtime"
-	unsafe "unsafe"
 )
 
 func init() {
@@ -110,7 +109,17 @@ func Convert_certificates_CertificateSigningRequestCondition_To_v1alpha1_Certifi
 
 func autoConvert_v1alpha1_CertificateSigningRequestList_To_certificates_CertificateSigningRequestList(in *CertificateSigningRequestList, out *certificates.CertificateSigningRequestList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]certificates.CertificateSigningRequest)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]certificates.CertificateSigningRequest, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_CertificateSigningRequest_To_certificates_CertificateSigningRequest(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 
@@ -120,7 +129,17 @@ func Convert_v1alpha1_CertificateSigningRequestList_To_certificates_CertificateS
 
 func autoConvert_certificates_CertificateSigningRequestList_To_v1alpha1_CertificateSigningRequestList(in *certificates.CertificateSigningRequestList, out *CertificateSigningRequestList, s conversion.Scope) error {
 	out.ListMeta = in.ListMeta
-	out.Items = *(*[]CertificateSigningRequest)(unsafe.Pointer(&in.Items))
+	if in.Items != nil {
+		in, out := &in.Items, &out.Items
+		*out = make([]CertificateSigningRequest, len(*in))
+		for i := range *in {
+			if err := Convert_certificates_CertificateSigningRequest_To_v1alpha1_CertificateSigningRequest(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
 	return nil
 }
 
@@ -129,10 +148,12 @@ func Convert_certificates_CertificateSigningRequestList_To_v1alpha1_CertificateS
 }
 
 func autoConvert_v1alpha1_CertificateSigningRequestSpec_To_certificates_CertificateSigningRequestSpec(in *CertificateSigningRequestSpec, out *certificates.CertificateSigningRequestSpec, s conversion.Scope) error {
-	out.Request = *(*[]byte)(unsafe.Pointer(&in.Request))
+	if err := conversion.Convert_Slice_byte_To_Slice_byte(&in.Request, &out.Request, s); err != nil {
+		return err
+	}
 	out.Username = in.Username
 	out.UID = in.UID
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
+	out.Groups = in.Groups
 	return nil
 }
 
@@ -141,10 +162,12 @@ func Convert_v1alpha1_CertificateSigningRequestSpec_To_certificates_CertificateS
 }
 
 func autoConvert_certificates_CertificateSigningRequestSpec_To_v1alpha1_CertificateSigningRequestSpec(in *certificates.CertificateSigningRequestSpec, out *CertificateSigningRequestSpec, s conversion.Scope) error {
-	out.Request = *(*[]byte)(unsafe.Pointer(&in.Request))
+	if err := conversion.Convert_Slice_byte_To_Slice_byte(&in.Request, &out.Request, s); err != nil {
+		return err
+	}
 	out.Username = in.Username
 	out.UID = in.UID
-	out.Groups = *(*[]string)(unsafe.Pointer(&in.Groups))
+	out.Groups = in.Groups
 	return nil
 }
 
@@ -153,8 +176,20 @@ func Convert_certificates_CertificateSigningRequestSpec_To_v1alpha1_CertificateS
 }
 
 func autoConvert_v1alpha1_CertificateSigningRequestStatus_To_certificates_CertificateSigningRequestStatus(in *CertificateSigningRequestStatus, out *certificates.CertificateSigningRequestStatus, s conversion.Scope) error {
-	out.Conditions = *(*[]certificates.CertificateSigningRequestCondition)(unsafe.Pointer(&in.Conditions))
-	out.Certificate = *(*[]byte)(unsafe.Pointer(&in.Certificate))
+	if in.Conditions != nil {
+		in, out := &in.Conditions, &out.Conditions
+		*out = make([]certificates.CertificateSigningRequestCondition, len(*in))
+		for i := range *in {
+			if err := Convert_v1alpha1_CertificateSigningRequestCondition_To_certificates_CertificateSigningRequestCondition(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Conditions = nil
+	}
+	if err := conversion.Convert_Slice_byte_To_Slice_byte(&in.Certificate, &out.Certificate, s); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -163,8 +198,20 @@ func Convert_v1alpha1_CertificateSigningRequestStatus_To_certificates_Certificat
 }
 
 func autoConvert_certificates_CertificateSigningRequestStatus_To_v1alpha1_CertificateSigningRequestStatus(in *certificates.CertificateSigningRequestStatus, out *CertificateSigningRequestStatus, s conversion.Scope) error {
-	out.Conditions = *(*[]CertificateSigningRequestCondition)(unsafe.Pointer(&in.Conditions))
-	out.Certificate = *(*[]byte)(unsafe.Pointer(&in.Certificate))
+	if in.Conditions != nil {
+		in, out := &in.Conditions, &out.Conditions
+		*out = make([]CertificateSigningRequestCondition, len(*in))
+		for i := range *in {
+			if err := Convert_certificates_CertificateSigningRequestCondition_To_v1alpha1_CertificateSigningRequestCondition(&(*in)[i], &(*out)[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Conditions = nil
+	}
+	if err := conversion.Convert_Slice_byte_To_Slice_byte(&in.Certificate, &out.Certificate, s); err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -144,7 +144,7 @@ func (config *DirectClientConfig) ClientConfig() (*rest.Config, error) {
 		clientConfig.Host = u.String()
 	}
 	if len(configAuthInfo.Impersonate) > 0 {
-		clientConfig.Impersonate = rest.ImpersonationConfig{UserName: configAuthInfo.Impersonate}
+		clientConfig.Impersonate = configAuthInfo.Impersonate
 	}
 
 	// only try to read the auth information if we are secure
@@ -215,7 +215,7 @@ func getUserIdentificationPartialConfig(configAuthInfo clientcmdapi.AuthInfo, fa
 		mergedConfig.BearerToken = string(tokenBytes)
 	}
 	if len(configAuthInfo.Impersonate) > 0 {
-		mergedConfig.Impersonate = rest.ImpersonationConfig{UserName: configAuthInfo.Impersonate}
+		mergedConfig.Impersonate = configAuthInfo.Impersonate
 	}
 	if len(configAuthInfo.ClientCertificate) > 0 || len(configAuthInfo.ClientCertificateData) > 0 {
 		mergedConfig.CertFile = configAuthInfo.ClientCertificate

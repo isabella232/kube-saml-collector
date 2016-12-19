@@ -22,17 +22,17 @@ import (
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeAuthenticationV1beta1 struct {
+type FakeAuthentication struct {
 	*testing.Fake
 }
 
-func (c *FakeAuthenticationV1beta1) TokenReviews() v1beta1.TokenReviewInterface {
+func (c *FakeAuthentication) TokenReviews() v1beta1.TokenReviewInterface {
 	return &FakeTokenReviews{c}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeAuthenticationV1beta1) RESTClient() rest.Interface {
+func (c *FakeAuthentication) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

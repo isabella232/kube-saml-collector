@@ -126,13 +126,16 @@ func MakeEllipticPrivateKeyPEM() ([]byte, error) {
 	return pem.EncodeToMemory(privateKeyPemBlock), nil
 }
 
-// GenerateSelfSignedCertKey creates a self-signed certificate and key for the given host.
+// GenerateSelfSignedCert creates a self-signed certificate and key for the given host.
 // Host may be an IP or a DNS name
 // You may also specify additional subject alt names (either ip or dns names) for the certificate
-func GenerateSelfSignedCertKey(host string, alternateIPs []net.IP, alternateDNS []string) ([]byte, []byte, error) {
+// The certificate will be created with file mode 0644. The key will be created with file mode 0600.
+// If the certificate or key files already exist, they will be overwritten.
+// Any parent directories of the certPath or keyPath will be created as needed with file mode 0755.
+func GenerateSelfSignedCert(host, certPath, keyPath string, alternateIPs []net.IP, alternateDNS []string) error {
 	priv, err := rsa.GenerateKey(cryptorand.Reader, 2048)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	template := x509.Certificate{
@@ -160,22 +163,30 @@ func GenerateSelfSignedCertKey(host string, alternateIPs []net.IP, alternateDNS 
 
 	derBytes, err := x509.CreateCertificate(cryptorand.Reader, &template, &template, &priv.PublicKey, priv)
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	// Generate cert
 	certBuffer := bytes.Buffer{}
 	if err := pem.Encode(&certBuffer, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	// Generate key
 	keyBuffer := bytes.Buffer{}
 	if err := pem.Encode(&keyBuffer, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}); err != nil {
-		return nil, nil, err
+		return err
 	}
 
-	return certBuffer.Bytes(), keyBuffer.Bytes(), nil
+	if err := WriteCert(certPath, certBuffer.Bytes()); err != nil {
+		return err
+	}
+
+	if err := WriteKey(keyPath, keyBuffer.Bytes()); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // FormatBytesCert receives byte array certificate and formats in human-readable format

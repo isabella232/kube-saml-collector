@@ -23,11 +23,9 @@ import (
 	"strings"
 )
 
-var GlobalEnvParams = SetEnvParams()
-
 // TODO(phase2) use componentconfig
 // we need some params for testing etc, let's keep these hidden for now
-func SetEnvParams() *EnvParams {
+func GetEnvParams() map[string]string {
 
 	envParams := map[string]string{
 		// TODO(phase1+): Mode prefix and host_pki_path to another place as constants, and use them everywhere
@@ -36,10 +34,9 @@ func SetEnvParams() *EnvParams {
 		"host_pki_path":      "/etc/kubernetes/pki",
 		"host_etcd_path":     "/var/lib/etcd",
 		"hyperkube_image":    "",
-		"repo_prefix":        "gcr.io/google_containers",
 		"discovery_image":    fmt.Sprintf("gcr.io/google_containers/kube-discovery-%s:%s", runtime.GOARCH, "1.0"),
 		"etcd_image":         "",
-		"component_loglevel": "--v=2",
+		"component_loglevel": "--v=4",
 	}
 
 	for k := range envParams {
@@ -48,14 +45,5 @@ func SetEnvParams() *EnvParams {
 		}
 	}
 
-	return &EnvParams{
-		KubernetesDir:     envParams["kubernetes_dir"],
-		HostPKIPath:       envParams["host_pki_path"],
-		HostEtcdPath:      envParams["host_etcd_path"],
-		HyperkubeImage:    envParams["hyperkube_image"],
-		RepositoryPrefix:  envParams["repo_prefix"],
-		DiscoveryImage:    envParams["discovery_image"],
-		EtcdImage:         envParams["etcd_image"],
-		ComponentLoglevel: envParams["component_loglevel"],
-	}
+	return envParams
 }

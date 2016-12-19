@@ -9,7 +9,10 @@ Usage:
    `-file` to output metadata to a directory (probably `emptyDir`) mounted in
    both containers.
 2. Make sure your IdP is configured to read the metadata from the shared file.
-3. For all SP pods that have valid saml metadata endpoints (usually
+3. If you need to use a custom certificate authority for your cluster masters,
+   include the full PEM-encoded certificate as the environment variable
+   `ROOT_CA`.
+4. For all SP pods that have valid saml metadata endpoints (usually
    `$APP/saml/metadata`), annotate them with the following options:
  - `k8s.unicon.net/saml-metadata-endpoint: /your/endpoint/here` *Required
  - `k8s.unicon.net/saml-metadata-port: "8080"` *Optional

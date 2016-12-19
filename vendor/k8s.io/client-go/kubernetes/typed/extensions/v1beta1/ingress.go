@@ -51,7 +51,7 @@ type ingresses struct {
 }
 
 // newIngresses returns a Ingresses
-func newIngresses(c *ExtensionsV1beta1Client, namespace string) *ingresses {
+func newIngresses(c *ExtensionsClient, namespace string) *ingresses {
 	return &ingresses{
 		client: c.RESTClient(),
 		ns:     namespace,

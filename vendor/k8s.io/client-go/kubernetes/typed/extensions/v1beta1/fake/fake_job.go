@@ -18,21 +18,21 @@ package fake
 
 import (
 	api "k8s.io/client-go/pkg/api"
+	unversioned "k8s.io/client-go/pkg/api/unversioned"
 	v1 "k8s.io/client-go/pkg/api/v1"
 	v1beta1 "k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	labels "k8s.io/client-go/pkg/labels"
-	schema "k8s.io/client-go/pkg/runtime/schema"
 	watch "k8s.io/client-go/pkg/watch"
 	testing "k8s.io/client-go/testing"
 )
 
 // FakeJobs implements JobInterface
 type FakeJobs struct {
-	Fake *FakeExtensionsV1beta1
+	Fake *FakeExtensions
 	ns   string
 }
 
-var jobsResource = schema.GroupVersionResource{Group: "extensions", Version: "v1beta1", Resource: "jobs"}
+var jobsResource = unversioned.GroupVersionResource{Group: "extensions", Version: "v1beta1", Resource: "jobs"}
 
 func (c *FakeJobs) Create(job *v1beta1.Job) (result *v1beta1.Job, err error) {
 	obj, err := c.Fake.

@@ -193,6 +193,16 @@ func (DeploymentStrategy) SwaggerDoc() map[string]string {
 	return map_DeploymentStrategy
 }
 
+var map_ExportOptions = map[string]string{
+	"":       "ExportOptions is the query options to the standard REST get call.",
+	"export": "Should this value be exported.  Export strips fields that a user can not specify.",
+	"exact":  "Should the export be exact.  Exact export maintains cluster-specific fields like 'Namespace'",
+}
+
+func (ExportOptions) SwaggerDoc() map[string]string {
+	return map_ExportOptions
+}
+
 var map_FSGroupStrategyOptions = map[string]string{
 	"":       "FSGroupStrategyOptions defines the strategy type and options used to create the strategy.",
 	"rule":   "Rule is the strategy that will dictate what FSGroup is used in the SecurityContext.",
@@ -367,7 +377,7 @@ func (IngressTLS) SwaggerDoc() map[string]string {
 }
 
 var map_Job = map[string]string{
-	"":         "Job represents the configuration of a single job. DEPRECATED: extensions/v1beta1.Job is deprecated, use batch/v1.Job instead.",
+	"":         "Job represents the configuration of a single job.",
 	"metadata": "Standard object's metadata. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#metadata",
 	"spec":     "Spec is a structure defining the expected behavior of a job. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#spec-and-status",
 	"status":   "Status is a structure describing current status of a job. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#spec-and-status",
@@ -392,7 +402,7 @@ func (JobCondition) SwaggerDoc() map[string]string {
 }
 
 var map_JobList = map[string]string{
-	"":         "JobList is a collection of jobs. DEPRECATED: extensions/v1beta1.JobList is deprecated, use batch/v1.JobList instead.",
+	"":         "JobList is a collection of jobs.",
 	"metadata": "Standard list metadata More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#metadata",
 	"items":    "Items is the list of Job.",
 }
@@ -605,7 +615,7 @@ func (RollbackConfig) SwaggerDoc() map[string]string {
 
 var map_RollingUpdateDeployment = map[string]string{
 	"":               "Spec to control the desired behavior of rolling update.",
-	"maxUnavailable": "The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding down. This can not be 0 if MaxSurge is 0. By default, a fixed value of 1 is used. Example: when this is set to 30%, the old RC can be scaled down to 70% of desired pods immediately when the rolling update starts. Once new pods are ready, old RC can be scaled down further, followed by scaling up the new RC, ensuring that the total number of pods available at all times during the update is at least 70% of desired pods.",
+	"maxUnavailable": "The maximum number of pods that can be unavailable during the update. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). Absolute number is calculated from percentage by rounding up. This can not be 0 if MaxSurge is 0. By default, a fixed value of 1 is used. Example: when this is set to 30%, the old RC can be scaled down to 70% of desired pods immediately when the rolling update starts. Once new pods are ready, old RC can be scaled down further, followed by scaling up the new RC, ensuring that the total number of pods available at all times during the update is at least 70% of desired pods.",
 	"maxSurge":       "The maximum number of pods that can be scheduled above the desired number of pods. Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%). This can not be 0 if MaxUnavailable is 0. Absolute number is calculated from percentage by rounding up. By default, a value of 1 is used. Example: when this is set to 30%, the new RC can be scaled up immediately when the rolling update starts, such that the total number of old and new pods do not exceed 130% of desired pods. Once old pods have been killed, new RC can be scaled up further, ensuring that total number of pods running at any time during the update is atmost 130% of desired pods.",
 }
 

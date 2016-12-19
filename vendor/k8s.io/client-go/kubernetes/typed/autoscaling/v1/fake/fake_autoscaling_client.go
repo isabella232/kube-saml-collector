@@ -22,17 +22,17 @@ import (
 	testing "k8s.io/client-go/testing"
 )
 
-type FakeAutoscalingV1 struct {
+type FakeAutoscaling struct {
 	*testing.Fake
 }
 
-func (c *FakeAutoscalingV1) HorizontalPodAutoscalers(namespace string) v1.HorizontalPodAutoscalerInterface {
+func (c *FakeAutoscaling) HorizontalPodAutoscalers(namespace string) v1.HorizontalPodAutoscalerInterface {
 	return &FakeHorizontalPodAutoscalers{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeAutoscalingV1) RESTClient() rest.Interface {
+func (c *FakeAutoscaling) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }
