@@ -30,8 +30,7 @@ type Counter interface {
 	Metric
 	Collector
 
-	// Inc increments the counter by 1. Use Add to increment it by arbitrary
-	// non-negative values.
+	// Inc increments the counter by 1.
 	Inc()
 	// Add adds the given value to the counter. It panics if the value is <
 	// 0.

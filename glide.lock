@@ -1,6 +1,8 @@
-hash: 2f4952e5fff5e43c1c5a4323c84763b5ac1ca1056cb646e9e5d3b72016ce2b80
-updated: 2016-12-19T14:58:39.158122217-07:00
+hash: e025f3ff2c1e4685fd91da9eab2093da33c940038ffc4f13cb79ea14a66d7fe0
+updated: 2016-12-19T17:35:03.246092431-07:00
 imports:
+- name: bitbucket.org/ww/goautoneg
+  version: 75cd24fc2f2c2a2088577d12123ddee5f54e0675
 - name: cloud.google.com/go
   version: 3b1ae45394a234c385be014e9a488f2bb6eef821
   subpackages:
@@ -82,7 +84,7 @@ imports:
 - name: github.com/pborman/uuid
   version: ca53cad383cad2479bbba7f7a1a05797ec1386e4
 - name: github.com/prometheus/client_golang
-  version: 575f371f7862609249a1be4c9145f429fe065e32
+  version: e56081f7b9d0c522b3b3b3ef154be6d74001382f
   subpackages:
   - prometheus
   - prometheus/promhttp
@@ -91,13 +93,12 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 195bde7883f7c39ea62b0d92ab7359b5327065cb
+  version: ffe929a3f4c4faeaa10f2b9535c2b1be3ad15650
   subpackages:
   - expfmt
-  - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: fcdb11ccb4389efb1b210b7ffb623ab71c5fdd60
+  version: 454a56f35412459b5e684fd5ec0f9211b94f002a
 - name: github.com/PuerkitoBio/purell
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
 - name: github.com/PuerkitoBio/urlesc

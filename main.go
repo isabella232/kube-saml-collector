@@ -45,6 +45,7 @@ var (
 	host      = flag.String("host", "", "Set a custom kubernetes host. If unset, defaults to in-cluster config")
 	printOnly = flag.Bool("print-only", false, fmt.Sprintf("Set %s to only print out pod URLS that would have been collected", os.Args[0]))
 	interval  = flag.Duration("interval", 10*time.Second, "The polling interval for querying kubernetes pods")
+	namespace = flag.String("namespace", "", "The kubernetes namespace to scan for metadata. Defaults to all namespaces.")
 
 	file           = flag.String("file", "", "Write all metadata out to the provided file name")
 	serveAggregate = flag.Bool("serve-aggregate", false, "If true, the container will itself serve its aggregated metadata at /saml/metadata on the http listener addr/port")
@@ -63,12 +64,14 @@ func main() {
 
 	switch *host {
 	case "":
+		glog.Info("Using in-cluster configuration")
 		var err error
 		cfg, err = rest.InClusterConfig()
 		if err != nil {
 			glog.Fatal(err)
 		}
 	default:
+		glog.Infof(`Using configuration with host "%s".`, *host)
 		cfg = &rest.Config{
 			Host: *host,
 		}
@@ -80,6 +83,8 @@ func main() {
 		cfg.CAData = []byte(ca)
 	}
 
+	glog.V(9).Infof("Config: %#v", cfg)
+
 	cli, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		glog.Fatal(err)
@@ -88,7 +93,7 @@ func main() {
 	for {
 		t := prometheus.NewTimer(collections)
 
-		pods, err := cli.Pods("").List(v1.ListOptions{})
+		pods, err := cli.Pods(*namespace).List(v1.ListOptions{})
 
 		if err != nil {
 			glog.Fatal(err)

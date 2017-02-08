@@ -37,6 +37,8 @@ Usage of ./kube-saml-collector:
     	log to standard error instead of files
   -metrics-listen string
     	The $IP:$PORT address to listen on for metrics requests (default ":8080")
+  -namespace string
+    	The kubernetes namespace to scan for metadata. Defaults to all namespaces.
   -print-only
     	Set ./kube-saml-collector to only print out pod URLS that would have been collected
   -serve-aggregate
