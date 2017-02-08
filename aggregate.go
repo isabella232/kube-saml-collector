@@ -22,12 +22,17 @@ const (
 	xmlns = "xmlns"
 )
 
-func (a *aggregator) add(r io.Reader) error {
-
+func (a *aggregator) init() {
 	if a.Entities == nil {
 		a.Entities = map[string]*etree.Element{}
+	}
+	if a.xmlns == nil {
 		a.xmlns = map[string]etree.Attr{}
 	}
+}
+
+func (a *aggregator) add(r io.Reader) error {
+	a.init()
 
 	d := etree.NewDocument()
 	if _, err := d.ReadFrom(r); err != nil {
@@ -60,6 +65,8 @@ func (a *aggregator) add(r io.Reader) error {
 }
 
 func (a *aggregator) addElement(e *etree.Element) {
+	a.init()
+
 	k := e.SelectAttrValue("entityID", "")
 	glog.Infof("Adding entity id \"%s\".\n", k)
 	if k != "" {
@@ -68,6 +75,7 @@ func (a *aggregator) addElement(e *etree.Element) {
 }
 
 func (a *aggregator) Doc() *etree.Document {
+	a.init()
 	a.xmlns[":xmlns"] = etree.Attr{Key: xmlns, Value: metadataNamespaceURN}
 
 	d := etree.NewDocument()
@@ -88,5 +96,6 @@ func (a *aggregator) Doc() *etree.Document {
 }
 
 func (a *aggregator) WriteTo(w io.Writer) (int64, error) {
+	a.init()
 	return a.Doc().WriteTo(w)
 }
