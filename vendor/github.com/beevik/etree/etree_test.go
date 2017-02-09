@@ -4,10 +4,7 @@
 
 package etree
 
-import (
-	"io"
-	"testing"
-)
+import "testing"
 
 func checkEq(t *testing.T, got, want string) {
 	if got == want {
@@ -139,25 +136,6 @@ func TestDocument(t *testing.T) {
 	}
 }
 
-func TestDocumentRead_NonUTF8Encodings(t *testing.T) {
-	s := `<?xml version="1.0" encoding="ISO-8859-1"?>
-	<store>
-	<book lang="en">
-		<title>Great Expectations</title>
-		<author>Charles Dickens</author>
-	</book>
-</store>`
-
-	doc := NewDocument()
-	doc.ReadSettings.CharsetReader = func(label string, input io.Reader) (io.Reader, error) {
-		return input, nil
-	}
-	err := doc.ReadFromString(s)
-	if err != nil {
-		t.Fatal("etree: incorrect ReadFromString result")
-	}
-}
-
 func TestWriteSettings(t *testing.T) {
 	BOM := "\xef\xbb\xbf"
 
@@ -173,11 +151,11 @@ func TestWriteSettings(t *testing.T) {
 
 	jon := people.CreateElement("Person")
 	jon.CreateAttr("name", "Jon O'Reilly")
-	jon.SetText("\r<'\">&")
+	jon.SetText("<'\">&")
 
 	sally := people.CreateElement("Person")
 	sally.CreateAttr("name", "Sally")
-	sally.CreateAttr("escape", "\r\n\t<'\">&")
+	sally.CreateAttr("escape", "<'\">&")
 
 	doc.Indent(2)
 	s, err := doc.WriteToString()
@@ -188,8 +166,8 @@ func TestWriteSettings(t *testing.T) {
 	expected := BOM + `<?xml-stylesheet type="text/xsl" href="style.xsl"?>
 <People>
   <!--These are all known people-->
-  <Person name="Jon O'Reilly">&#xD;&lt;'"&gt;&amp;</Person>
-  <Person name="Sally" escape="&#xD;&#xA;&#x9;&lt;'&quot;>&amp;"></Person>
+  <Person name="Jon O'Reilly">&lt;'"&gt;&amp;</Person>
+  <Person name="Sally" escape="&lt;'&quot;>&amp;"></Person>
 </People>
 `
 	checkEq(t, s, expected)
